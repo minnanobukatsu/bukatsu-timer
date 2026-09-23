@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BUKATSU NEXT インターバルタイマー</title>
-    <!-- Tailwind CSS for styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     
     <style>
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            background-color: #111;
+            background-color: #022c22; /* エメラルドダーク */
             color: #fff;
             user-select: none;
             -webkit-user-select: none;
@@ -21,7 +21,7 @@
         .font-num {
             font-family: 'Oswald', sans-serif;
         }
-        /* 巨大フォント用のレスポンシブ設定 */
+        /* 巨大フォント */
         .text-giant {
             font-size: 35vmin;
             line-height: 1;
@@ -32,16 +32,16 @@
             text-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         
-        /* フェーズごとの背景色トランジション */
+        /* 背景色トランジション */
         #timer-screen {
             transition: background-color 0.3s ease;
         }
-        .bg-phase-setup { background-color: #022c22; } /* エメラルドダーク */
-        .bg-phase-prep { background-color: #eab308; } /* イエロー */
-        .bg-phase-work { background-color: #10b981; } /* エメラルドグリーン */
-        .bg-phase-rest { background-color: #ef4444; } /* レッド */
-        .bg-phase-agility { background-color: #f97316; } /* オレンジ */
-        .bg-phase-done { background-color: #8b5cf6; } /* パープル */
+        .bg-phase-setup { background-color: #022c22; } /* 準備中背景 (emerald-950) */
+        .bg-phase-prep { background-color: #eab308; } /* 黄色 (準備) */
+        .bg-phase-work { background-color: #059669; } /* エメラルド (トレーニング) */
+        .bg-phase-rest { background-color: #ef4444; } /* 赤 (休憩) */
+        .bg-phase-agility { background-color: #f97316; } /* オレンジ (アジリティ) */
+        .bg-phase-done { background-color: #8b5cf6; } /* 紫 (終了) */
 
         /* 操作用透明レイヤー */
         .touch-area {
@@ -68,7 +68,11 @@
     <!-- 設定画面 -->
     <div id="setup-screen" class="absolute inset-0 bg-emerald-950 z-40 flex flex-col p-6 overflow-y-auto">
         <div class="max-w-md w-full mx-auto space-y-6 pb-20">
-            <h1 class="text-3xl font-black text-center text-white mt-4 mb-6 tracking-wider leading-tight">BUKATSU NEXT<br><span class="text-xl text-emerald-400">インターバルタイマー</span></h1>
+            
+            <h1 class="text-3xl font-black text-center text-white mt-8 mb-6 tracking-wider leading-tight">
+                BUKATSU NEXT<br>
+                <span class="text-xl text-emerald-400">インターバルタイマー</span>
+            </h1>
             
             <!-- プリセットロード -->
             <div class="flex gap-2">
@@ -105,7 +109,7 @@
                         <div class="w-14 h-7 bg-emerald-950 border border-emerald-700/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
                     </label>
                 </div>
-                <p class="text-xs text-emerald-200/70">トレーニング中にランダムなタイミングで「右」「左」「前」「後」などの指示が出ます。</p>
+                <p class="text-xs text-emerald-200/70">トレーニング中にランダムなタイミングで「右」「左」などの指示が出ます。</p>
             </div>
 
             <!-- 表示・音声設定 -->
@@ -136,26 +140,26 @@
     <div id="timer-screen" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center bg-phase-setup">
         
         <!-- ヘッダー情報 -->
-        <div class="absolute top-8 w-full flex justify-between items-center px-6 md:px-8 text-white/80 font-bold text-xl md:text-4xl z-50 pointer-events-none">
+        <div class="absolute top-8 w-full flex justify-between items-center px-6 md:px-8 text-white/90 font-bold text-2xl md:text-4xl z-50 pointer-events-none">
             <!-- 終了（ホームへ戻る）ボタン -->
-            <button onclick="confirmReset()" class="pointer-events-auto bg-black/40 hover:bg-black/60 p-3 rounded-full backdrop-blur-sm transition flex items-center justify-center shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button onclick="resetTimer()" class="pointer-events-auto bg-black/40 hover:bg-black/60 p-4 rounded-full backdrop-blur-sm transition flex items-center justify-center shadow-lg transform active:scale-90">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-10 md:w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <div id="phase-text" class="tracking-widest flex-1 text-center">READY</div>
-            <div class="font-num tracking-wide">SET: <span id="set-text">1/8</span></div>
+            <div id="phase-text" class="tracking-widest flex-1 text-center text-4xl">準備</div>
+            <div class="font-num tracking-wide text-3xl">SET: <span id="set-text">1/8</span></div>
         </div>
 
         <!-- メインタイム表示 -->
         <div id="time-display" class="font-num text-giant font-black tabular-nums z-20">00.0</div>
 
-        <!-- アジリティ指示表示 (オーバーレイ) -->
+        <!-- アジリティ指示表示 -->
         <div id="agility-display" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-phase-agility z-30 pointer-events-none">
             <div id="agility-text" class="text-huge font-black tracking-widest text-white animate-pulse"></div>
         </div>
 
-        <!-- 停止ステータス表示 (オーバーレイ) -->
+        <!-- 停止ステータス表示 -->
         <div id="status-display" class="hidden absolute inset-0 flex items-center justify-center bg-black/60 z-30 pointer-events-none backdrop-blur-sm">
             <div class="text-6xl md:text-8xl font-black tracking-widest text-white/80">PAUSED</div>
         </div>
@@ -164,34 +168,33 @@
         <div id="touch-top" class="touch-area" onclick="togglePause()">
             <span class="absolute bottom-4 text-white/30 text-lg font-bold pointer-events-none">▲ タップで 停止 / 再開 ▲</span>
         </div>
-        <div id="touch-bottom" class="touch-area" onclick="confirmReset()">
+        <div id="touch-bottom" class="touch-area" onclick="resetTimer()">
             <span class="absolute top-4 text-white/30 text-lg font-bold pointer-events-none">▼ タップで リセット ▼</span>
         </div>
     </div>
 
     <script>
-        // --- 状態管理 ---
+        // 状態管理
         let timerState = {
             isRunning: false,
             isPaused: false,
-            phase: 'setup', // setup, prep, work, rest, done
+            phase: 'setup', 
             currentSet: 1,
             timeLeft: 0,
             endTime: 0,
-            config: {
-                prep: 5, work: 20, rest: 10, sets: 8, agility: false, voice: true, decimals: true
-            }
+            config: { prep: 5, work: 20, rest: 10, sets: 8, agility: false, voice: true, decimals: true }
         };
         
         let animationFrameId;
         let wakeLock = null;
         let nextAgilityTime = 0;
         let isAgilityActive = false;
+        let lastAnnouncedSecond = -1;
 
         const AGILITY_COMMANDS = ['右', '左', '前', '後ろ', 'ジャンプ', 'ダッシュ'];
         const AGILITY_VISUALS = ['右 ▶︎', '◀︎ 左', '▲ 前', '▼ 後ろ', 'JUMP', 'DASH'];
 
-        // --- Web Audio API (効果音生成) ---
+        // Web Audio API (効果音生成)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         function playTone(freq, type, duration, vol=1) {
@@ -208,17 +211,11 @@
             osc.stop(audioCtx.currentTime + duration);
         }
 
-        // バスケ用サウンド
-        function playWhistle() { 
-            // ホイッスル風の高い音
-            playTone(1500, 'square', 0.1, 0.5);
-            setTimeout(() => playTone(1550, 'square', 0.4, 0.7), 80);
-        }
         function playBuzzer() {
-            // バスケの「ビーー」というブザー音（不協和音で再現）
+            // バスケのブザー音（ビーーー！）
             if(audioCtx.state === 'suspended') audioCtx.resume();
-            const freqs = [350, 440]; // ノコギリ波の重なりでビーっという音を作る
-            const duration = 0.8;
+            const freqs = [300, 310, 450]; // 濁った音を作るための周波数の組み合わせ
+            const duration = 1.0; // 1秒間
             
             freqs.forEach(freq => {
                 const osc = audioCtx.createOscillator();
@@ -226,8 +223,8 @@
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
                 
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); // 音量
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + duration - 0.05);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime + duration - 0.1);
                 gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + duration);
                 
                 osc.connect(gain);
@@ -236,51 +233,42 @@
                 osc.stop(audioCtx.currentTime + duration);
             });
         }
-        function playBeep() { playTone(800, 'sine', 0.15, 0.5); }
-        function playHighBeep() { playTone(1200, 'sine', 0.3, 0.6); }
-        function playTick() { playTone(1000, 'sine', 0.05, 0.3); } // カウントダウン用の短い音
+        function playTick() { playTone(1000, 'sine', 0.05, 0.3); } // 毎秒の短い音
+        function playBeep() { playTone(800, 'sine', 0.15, 0.5); } // カウントダウン音
+        function playHighBeep() { playTone(1200, 'sine', 0.3, 0.6); } // 再開音
         function playAgilityBeep() { playTone(2000, 'square', 0.1, 0.8); }
 
-        // --- STREAMING_CHUNK:Setting up Speech Synthesis... ---
-        // --- Web Speech API (音声読み上げ) ---
+        // Web Speech API (音声読み上げ)
         function speak(text) {
             if (!timerState.config.voice) return;
             if ('speechSynthesis' in window) {
-                speechSynthesis.cancel(); // 前の音声をキャンセル
+                window.speechSynthesis.cancel(); // 連続読み上げの詰まりを防止
                 const ut = new SpeechSynthesisUtterance(text);
-                ut.lang = 'ja-JP';
-                ut.rate = 1.2; // 運動中なので少し早口
-                ut.pitch = 1.1;
-                speechSynthesis.speak(ut);
-            }
-        }
-        // iOS等で音声を初期化するためのダミー発話
-        function initAudio() {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            if ('speechSynthesis' in window) {
-                let ut = new SpeechSynthesisUtterance('');
-                ut.volume = 0;
-                speechSynthesis.speak(ut);
+                ut.lang = 'ja-JP'; // 必ず日本語を指定
+                ut.rate = 1.2;
+                window.speechSynthesis.speak(ut);
             }
         }
 
-        // --- STREAMING_CHUNK:Wake Lock API implementation... ---
-        // --- Screen Wake Lock API (画面消灯防止) ---
+        // スマホ制限突破用：ユーザー操作時に無音を再生してエンジンを起動
+        function initAudio() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            if ('speechSynthesis' in window) {
+                const dummy = new SpeechSynthesisUtterance(' '); // 空白文字
+                dummy.lang = 'ja-JP';
+                dummy.volume = 0; // 無音
+                window.speechSynthesis.speak(dummy);
+            }
+        }
+
+        // Screen Wake Lock API (画面消灯防止)
         async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
-                    wakeLock.addEventListener('release', () => {
-                        console.log('Wake Lock was released');
-                    });
                 }
             } catch (err) {
-                // iframe内など、権限がない環境ではエラーになるため警告にとどめる
-                if (err.name === 'NotAllowedError') {
-                    console.warn('Wake Lock APIが許可されていない環境です（プレビュー用iframeなど）。自動スリープは無効化されません。');
-                } else {
-                    console.warn(`Wake Lock error: ${err.name}, ${err.message}`);
-                }
+                console.warn(`Wake Lock error: ${err.name}, ${err.message}`);
             }
         }
         function releaseWakeLock() {
@@ -288,14 +276,7 @@
                 wakeLock.release().then(() => { wakeLock = null; });
             }
         }
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible' && timerState.isRunning) {
-                await requestWakeLock();
-            }
-        });
 
-        // --- STREAMING_CHUNK:DOM elements and UI functions... ---
-        // DOM要素
         const screens = {
             setup: document.getElementById('setup-screen'),
             timer: document.getElementById('timer-screen')
@@ -309,7 +290,6 @@
             status: document.getElementById('status-display')
         };
 
-        // UI更新
         function setPhaseColor(phase) {
             screens.timer.className = `hidden absolute inset-0 z-30 flex flex-col items-center justify-center bg-phase-${phase}`;
             screens.timer.classList.remove('hidden');
@@ -320,9 +300,7 @@
             const totalSeconds = ms / 1000;
             
             if (timerState.config.decimals) {
-                if (totalSeconds >= 100) {
-                    return Math.ceil(totalSeconds).toString();
-                }
+                if (totalSeconds >= 100) return Math.ceil(totalSeconds).toString();
                 return totalSeconds.toFixed(1);
             } else {
                 return Math.ceil(totalSeconds).toString();
@@ -343,15 +321,10 @@
             displays.phase.textContent = phaseStr;
         }
 
-        // --- STREAMING_CHUNK:Timer Core Logic... ---
-        // --- タイマーロジック ---
-        let lastAnnouncedSecond = -1;
-
         function startTimer() {
-            initAudio(); // ユーザーアクション内でAudio初期化必須
+            initAudio(); // 【重要】タップイベント内で音声エンジンを初期化
             requestWakeLock();
             
-            // 設定値取得
             timerState.config.prep = parseInt(document.getElementById('input-prep').value) || 5;
             timerState.config.work = parseInt(document.getElementById('input-work').value) || 20;
             timerState.config.rest = parseInt(document.getElementById('input-rest').value) || 10;
@@ -370,7 +343,7 @@
             timerState.isPaused = false;
             displays.status.classList.add('hidden');
             
-            saveToLocal(); // 次回のために保存
+            saveToLocal();
             loop();
         }
 
@@ -387,20 +360,17 @@
                 speak("準備");
             } else if (newPhase === 'work') {
                 duration = timerState.config.work;
-                playBuzzer();
+                playBuzzer(); // 開始ブザー
                 if(timerState.currentSet === timerState.config.sets) speak("ラストセット！");
-                else speak("スタート");
+                else speak("トレーニング開始");
                 
-                // アジリティ設定
-                if (timerState.config.agility && duration > 5) {
-                    scheduleNextAgility(duration);
-                }
+                if (timerState.config.agility && duration > 5) scheduleNextAgility(duration);
             } else if (newPhase === 'rest') {
                 duration = timerState.config.rest;
-                playBuzzer();
+                playBuzzer(); // 休憩ブザー
                 speak("休憩");
             } else if (newPhase === 'done') {
-                playBuzzer();
+                playBuzzer(); // 終了ブザー
                 speak("練習終了、お疲れ様でした");
                 timerState.isRunning = false;
                 releaseWakeLock();
@@ -412,10 +382,7 @@
             updateUI();
         }
 
-        // --- STREAMING_CHUNK:Agility and Loop functionality... ---
-        // アジリティ機能
         function scheduleNextAgility(remainingWorkSeconds) {
-            // 残り時間の間にランダムで発動（最短4秒後）
             if (remainingWorkSeconds < 4) return; 
             const triggerIn = (Math.random() * (Math.min(10, remainingWorkSeconds - 2)) + 3);
             nextAgilityTime = timerState.endTime - (triggerIn * 1000);
@@ -433,18 +400,15 @@
             displays.agilityText.innerHTML = visualText;
             displays.agility.classList.remove('hidden');
 
-            // 1.5秒後に消す
             setTimeout(() => {
                 displays.agility.classList.add('hidden');
                 isAgilityActive = false;
-                // まだ時間が残っていれば次をスケジュール
                 if (timerState.phase === 'work' && timerState.timeLeft > 4000 && !timerState.isPaused) {
                     scheduleNextAgility(timerState.timeLeft / 1000);
                 }
             }, 1500);
         }
 
-        // メインループ
         function loop() {
             if (!timerState.isRunning) return;
             if (timerState.isPaused) {
@@ -457,38 +421,33 @@
 
             // アジリティチェック
             if (timerState.phase === 'work' && timerState.config.agility && !isAgilityActive) {
-                if (now >= nextAgilityTime && timerState.timeLeft > 2000) {
-                    triggerAgility();
-                }
+                if (now >= nextAgilityTime && timerState.timeLeft > 2000) triggerAgility();
             }
 
-            // カウントダウン音声とビープ
+            // 毎秒の処理とカウントダウン
             const currentSecond = Math.ceil(timerState.timeLeft / 1000);
             if (currentSecond !== lastAnnouncedSecond && currentSecond > 0) {
                 lastAnnouncedSecond = currentSecond;
                 
-                // 毎秒のビープ音を鳴らす
-                if(currentSecond > 10) {
-                    playTick();
-                }
+                playTick(); // 毎秒のチクタク音
 
-                // 10, 9, 8...1 カウントダウン音声とビープ
                 if (currentSecond <= 10) {
-                    speak(currentSecond.toString()); // 数値を音声で読み上げ
-                    playBeep(); // 少し長めのビープ音
+                    // 10秒前からは数字を音声読み上げ
+                    speak(currentSecond.toString());
+                    
+                    if (currentSecond <= 5) {
+                        // 5秒前からは目立つビープ音も鳴らす
+                        playBeep();
+                    }
                 }
             }
 
+            // フェーズ移行処理
             if (timerState.timeLeft <= 0) {
-                // フェーズ切り替え
-                if (timerState.phase === 'prep') {
-                    switchPhase('work');
-                } else if (timerState.phase === 'work') {
-                    if (timerState.currentSet >= timerState.config.sets) {
-                        switchPhase('done');
-                    } else {
-                        switchPhase('rest');
-                    }
+                if (timerState.phase === 'prep') switchPhase('work');
+                else if (timerState.phase === 'work') {
+                    if (timerState.currentSet >= timerState.config.sets) switchPhase('done');
+                    else switchPhase('rest');
                 } else if (timerState.phase === 'rest') {
                     timerState.currentSet++;
                     switchPhase('work');
@@ -500,38 +459,22 @@
             animationFrameId = requestAnimationFrame(loop);
         }
 
-        // --- STREAMING_CHUNK:Control Events and LocalStorage... ---
-        // --- 操作系 ---
         function togglePause() {
             if (!timerState.isRunning || timerState.phase === 'done') return;
             
             timerState.isPaused = !timerState.isPaused;
             if (timerState.isPaused) {
                 displays.status.classList.remove('hidden');
-                // 一時停止した時点での残り時間を保存
                 timerState.endTime = 0; 
                 playBeep();
             } else {
                 displays.status.classList.add('hidden');
-                // 再開時にendTimeを再計算
                 timerState.endTime = Date.now() + timerState.timeLeft;
-                // アジリティも再計算
                 if (timerState.config.agility && timerState.phase === 'work') {
-                    nextAgilityTime = timerState.endTime - ( (timerState.endTime - nextAgilityTime) ); 
+                    nextAgilityTime = timerState.endTime - ((timerState.endTime - nextAgilityTime)); 
                 }
                 playHighBeep();
             }
-        }
-
-        function confirmReset() {
-            // 一時停止状態にしてから確認
-            const wasPaused = timerState.isPaused;
-            timerState.isPaused = true;
-            
-            // confirmの代わりに独自UIを出す手もあるが、シンプルに
-            // ※この要件では単独ファイル・iframe動作を考慮しconfirmは使わない仕様。
-            // 画面を直接リセットする。
-            resetTimer();
         }
 
         function resetTimer() {
@@ -540,9 +483,9 @@
             releaseWakeLock();
             screens.timer.classList.add('hidden');
             screens.setup.classList.remove('hidden');
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         }
 
-        // --- プリセットと保存機能 ---
         function loadPreset(type) {
             if (type === 'shuttle') {
                 document.getElementById('input-prep').value = 5;
@@ -569,9 +512,7 @@
                 voice: document.getElementById('input-voice').checked,
                 decimals: document.getElementById('input-decimals').checked
             };
-            try {
-                localStorage.setItem('hooptimer_config', JSON.stringify(config));
-            } catch(e){}
+            try { localStorage.setItem('hooptimer_config', JSON.stringify(config)); } catch(e){}
         }
 
         function loadFromLocal() {
@@ -590,11 +531,7 @@
             } catch(e){}
         }
 
-        // 初期化
-        window.onload = () => {
-            loadFromLocal();
-        };
-
+        window.onload = () => loadFromLocal();
     </script>
 </body>
 </html>
