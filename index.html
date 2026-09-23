@@ -42,25 +42,6 @@
         .bg-phase-rest { background-color: #ef4444; } /* 赤 (休憩) */
         .bg-phase-agility { background-color: #f97316; } /* オレンジ (アジリティ) */
         .bg-phase-done { background-color: #8b5cf6; } /* 紫 (終了) */
-
-        /* 操作用透明レイヤー */
-        .touch-area {
-            position: absolute;
-            width: 100%;
-            height: 50%;
-            z-index: 40;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        .touch-area:active {
-            opacity: 0.1;
-            background-color: #fff;
-        }
-        #touch-top { top: 0; }
-        #touch-bottom { bottom: 0; }
     </style>
 </head>
 <body class="h-screen w-screen">
@@ -164,12 +145,11 @@
             <div class="text-6xl md:text-8xl font-black tracking-widest text-white/80">PAUSED</div>
         </div>
 
-        <!-- 見えない操作エリア -->
-        <div id="touch-top" class="touch-area" onclick="togglePause()">
-            <span class="absolute bottom-4 text-white/30 text-lg font-bold pointer-events-none">▲ タップで 停止 / 再開 ▲</span>
-        </div>
-        <div id="touch-bottom" class="touch-area" onclick="resetTimer()">
-            <span class="absolute top-4 text-white/30 text-lg font-bold pointer-events-none">▼ タップで リセット ▼</span>
+        <!-- 一時停止 / 再開 ボタン -->
+        <div class="absolute bottom-12 w-full flex justify-center z-50 pointer-events-none">
+            <button id="pause-btn" onclick="togglePause()" class="pointer-events-auto bg-black/40 hover:bg-black/60 text-white font-bold py-5 px-14 rounded-full backdrop-blur-sm transition shadow-lg text-2xl tracking-widest transform active:scale-95 border border-white/20">
+                一時停止
+            </button>
         </div>
     </div>
 
@@ -342,6 +322,8 @@
             timerState.isRunning = true;
             timerState.isPaused = false;
             displays.status.classList.add('hidden');
+            const pauseBtn = document.getElementById('pause-btn');
+            if(pauseBtn) pauseBtn.textContent = '一時停止';
             
             saveToLocal();
             loop();
@@ -463,12 +445,16 @@
             if (!timerState.isRunning || timerState.phase === 'done') return;
             
             timerState.isPaused = !timerState.isPaused;
+            const pauseBtn = document.getElementById('pause-btn');
+            
             if (timerState.isPaused) {
                 displays.status.classList.remove('hidden');
+                if(pauseBtn) pauseBtn.textContent = '再開';
                 timerState.endTime = 0; 
                 playBeep();
             } else {
                 displays.status.classList.add('hidden');
+                if(pauseBtn) pauseBtn.textContent = '一時停止';
                 timerState.endTime = Date.now() + timerState.timeLeft;
                 if (timerState.config.agility && timerState.phase === 'work') {
                     nextAgilityTime = timerState.endTime - ((timerState.endTime - nextAgilityTime)); 
