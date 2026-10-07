@@ -42,6 +42,11 @@
       background: #3F3F46;
       border-radius: 9999px;
     }
+    button, .no-select {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: manipulation;
+    }
     @keyframes lookup-pop {
       0% { transform: scale(0.9); opacity: 0.5; }
       50% { transform: scale(1.06); }
@@ -57,11 +62,6 @@
       0% { transform: scale(2.2) rotate(-15deg); opacity: 0; }
       100% { transform: scale(1) rotate(0deg); opacity: 1; }
     }
-    button, .no-select {
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      touch-action: manipulation;
-    }
     @keyframes eyes-blink {
       0%, 100% { opacity: 0; transform: scale(0.9); }
       15%, 85% { opacity: 1; transform: scale(1.05); }
@@ -74,31 +74,80 @@
       transform: rotate(-90deg);
       transform-origin: 50% 50%;
     }
-    /* 横向き端末用スコアボード表示調整 */
-    @media (orientation: landscape) and (max-height: 520px) {
+    /* タップフィードバックHUDアニメーション */
+    @keyframes hud-fade {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+      80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+    }
+    .hud-popup-anim {
+      animation: hud-fade 0.85s ease-out forwards;
+    }
+
+    /* ========================================== */
+    /* 横画面（ランドスケープ）専用 全画面スコアボードスタイル */
+    /* ========================================== */
+    @media (orientation: landscape) and (max-height: 560px) {
+      /* 1. 最上部ヘッダー（ロゴやタブナビ）を完全に消去 */
+      #appHeader {
+        display: none !important;
+      }
+      main {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      /* 2. タイマー画面を画面いっぱいの全面キャンバスに拡張 */
       #viewTimerActive {
-        padding: 0.25rem !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 100 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #09090B !important;
       }
       #timerCard {
-        min-height: auto !important;
-        height: calc(100vh - 72px) !important;
-        padding: 0.5rem 1.25rem !important;
-        flex-direction: row !important;
-        justify-content: space-around !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        padding: 0.5rem 1rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
+      /* 3. 横画面時はボタン類（リセット・一時停止・テンポドラムなど）を完全非表示 */
+      #timerControlsRow,
+      #timerSubControlBar,
+      #timerTopStandardBar {
+        display: none !important;
+      }
+      /* 4. タイマー数字とリングゲージを超特大化 */
       #timerRingSvg {
-        width: 160px !important;
-        height: 160px !important;
+        width: min(72vh, 320px) !important;
+        height: min(72vh, 320px) !important;
       }
       #timerNumber {
-        font-size: 4.8rem !important;
+        font-size: min(28vh, 7.5rem) !important;
+        line-height: 1 !important;
       }
-      #landscapeSidePanel {
+      #phaseGuideText {
+        font-size: 0.95rem !important;
+        margin-top: 0.25rem !important;
+      }
+      /* 5. 横画面専用の操作ガイドバーと退出ボタンを表示 */
+      #landscapeGuideBar {
         display: flex !important;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
+      }
+      #landscapeExitBtn {
+        display: flex !important;
       }
     }
   </style>
@@ -106,9 +155,9 @@
 <body class="bg-brandDark text-white font-sans min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black">
 
   <!-- ========================================== -->
-  <!-- TOP NAVIGATION HEADER                      -->
+  <!-- TOP NAVIGATION HEADER (横画面時は完全非表示) -->
   <!-- ========================================== -->
-  <header class="sticky top-0 z-30 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80 px-3 sm:px-4 py-2.5">
+  <header id="appHeader" class="sticky top-0 z-30 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80 px-3 sm:px-4 py-2.5">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <!-- BUKATSU NEXT Brand Logo -->
       <button type="button" onclick="goToTimerSettingsTab()" class="flex items-center space-x-2 text-left cursor-pointer hover:opacity-90 active:scale-95 transition-transform no-select focus:outline-none" title="ホーム画面にもどる">
@@ -152,7 +201,7 @@
     <!-- ========================================== -->
     <div id="viewTimerSetup" class="flex-1 flex flex-col space-y-3.5">
       
-      <!-- Top Mini Weekly Streak Progress Bar (Tap to open Stamp Book) -->
+      <!-- Top Mini Weekly Streak Progress Bar -->
       <div onclick="switchMainTab('stamp')" class="cursor-pointer bg-zinc-900/90 hover:bg-zinc-900 border border-zinc-800/90 rounded-2xl p-2.5 sm:p-3 shadow-md transition-all active:scale-98">
         <div class="flex items-center justify-between mb-1.5">
           <div class="flex items-center gap-1.5">
@@ -204,17 +253,17 @@
         </div>
       </div>
 
-      <!-- Manual Stepper Adjustment Drawer (1-Second Increments) -->
+      <!-- Manual Stepper Adjustment (1-Second Increments) -->
       <div class="bg-zinc-900/95 border border-zinc-800 rounded-2xl sm:rounded-3xl p-3.5 shadow-xl space-y-2.5">
         <div class="flex items-center justify-between border-b border-zinc-800/80 pb-1.5">
           <div class="flex items-center gap-1.5">
             <span class="text-sm">⚙️</span>
             <span class="text-xs font-black text-white">秒数の微調整（1秒刻み）</span>
           </div>
-          <span class="text-[10px] text-zinc-400 font-mono">1秒単位で調整可能</span>
+          <span class="text-[10px] text-zinc-400 font-mono">1秒単位で自由に調整可能</span>
         </div>
 
-        <!-- 4 Balanced Setting Stepper Cards (2x2 Grid on Mobile for Maximum Ergonomics) -->
+        <!-- 4 Stepper Cards (2x2 Grid) -->
         <div class="grid grid-cols-2 gap-2">
           <!-- 1. PREP -->
           <div class="bg-zinc-950 p-2.5 rounded-xl border border-zinc-800 flex flex-col justify-between">
@@ -264,7 +313,7 @@
             </div>
           </div>
 
-          <!-- 4. SETS (1-Set Increments) -->
+          <!-- 4. SETS -->
           <div class="bg-zinc-950 p-2.5 rounded-xl border border-zinc-800 flex flex-col justify-between">
             <div class="flex items-center justify-between pb-1">
               <span class="text-[11px] font-bold text-purple-400">セット数</span>
@@ -303,7 +352,7 @@
             </label>
           </div>
 
-          <!-- Look-Up Category & Interval Selector (Appears when enabled) -->
+          <!-- Look-Up Category & Interval Selector -->
           <div id="lookupCategorySelector" class="hidden pt-2 mt-2 border-t border-zinc-800/60 space-y-2">
             <!-- 秒数の直接手動入力設定 -->
             <div class="bg-zinc-950/80 p-2 rounded-xl border border-zinc-800 flex items-center justify-between">
@@ -429,8 +478,8 @@
     <!-- ========================================== -->
     <div id="viewTimerActive" class="hidden flex-1 flex flex-col space-y-3">
       
-      <!-- Top Bar: Back to Settings button + Fullscreen + Lookup badge -->
-      <div class="flex items-center justify-between">
+      <!-- Top Standard Bar (横画面時は非表示) -->
+      <div id="timerTopStandardBar" class="flex items-center justify-between">
         <button onclick="leaveCountdownScreen()" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition flex items-center gap-1 border border-zinc-700">
           <span>‹</span>
           <span>設定にもどる</span>
@@ -453,13 +502,31 @@
         </div>
       </div>
 
-      <!-- Visual Giant Display Board -->
-      <div id="timerCard" class="relative rounded-3xl p-5 sm:p-6 bg-zinc-900 border-2 border-zinc-800 transition-all duration-500 shadow-2xl flex flex-col items-center justify-center flex-1 min-h-[350px] overflow-hidden">
+      <!-- 横画面専用操作ヒントバー（横画面時のみ上部に表示） -->
+      <div id="landscapeGuideBar" class="hidden w-full items-center justify-between px-4 py-1.5 text-[11px] font-bold text-zinc-400 z-30 select-none">
+        <span class="flex items-center gap-2 text-zinc-300">
+          <span class="bg-zinc-800/90 border border-zinc-700 px-2 py-0.5 rounded-md">👆 1回タップ: 一時停止/再開</span>
+          <span class="bg-zinc-800/90 border border-zinc-700 px-2 py-0.5 rounded-md">✌ 2回タップ: リセット</span>
+        </span>
+        <button id="landscapeExitBtn" onclick="leaveCountdownScreen()" class="hidden bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-3 py-1 rounded-lg text-xs font-bold items-center gap-1 transition">
+          ✕ 終了
+        </button>
+      </div>
+
+      <!-- Visual Giant Display Board (タップジェスチャー領域) -->
+      <div id="timerCard" onclick="handleTimerCardTap(event)" class="relative rounded-3xl p-5 sm:p-6 bg-zinc-900 border-2 border-zinc-800 transition-all duration-500 shadow-2xl flex flex-col items-center justify-center flex-1 min-h-[350px] overflow-hidden cursor-pointer select-none">
+        
         <!-- Ambient Background Glow -->
         <div id="ambientGlow" class="absolute inset-0 bg-transparent opacity-30 transition-all duration-700 pointer-events-none"></div>
 
+        <!-- タップ操作時に中央に浮かび上がるフィードバックHUD -->
+        <div id="tapFeedbackHUD" class="hidden pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 px-6 py-4 rounded-3xl bg-zinc-950/90 border-2 border-emerald-500/80 shadow-2xl backdrop-blur-md flex flex-col items-center justify-center text-center">
+          <span id="hudIcon" class="text-4xl sm:text-5xl mb-1">⏸</span>
+          <span id="hudText" class="text-base sm:text-xl font-black text-white tracking-wider">一時停止中</span>
+        </div>
+
         <!-- Header: Phase Badge and Set Counter -->
-        <div class="w-full flex items-center justify-between z-10 mb-1">
+        <div class="w-full flex items-center justify-between z-10 mb-1 pointer-events-none">
           <div class="flex items-center gap-1.5">
             <span id="phaseBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 transition-all shadow">
               準備完了
@@ -469,14 +536,14 @@
 
           <div class="text-right">
             <span class="text-xs text-zinc-400 font-bold">SET</span>
-            <span id="currentSetDisplay" class="text-xl font-black text-white ml-0.5">1</span>
+            <span id="currentSetDisplay" class="text-xl sm:text-2xl font-black text-white ml-0.5">1</span>
             <span class="text-xs text-zinc-500">/</span>
-            <span id="totalSetDisplay" class="text-xs font-bold text-zinc-400">5</span>
+            <span id="totalSetDisplay" class="text-xs sm:text-sm font-bold text-zinc-400">5</span>
           </div>
         </div>
 
         <!-- Look-Up Target Box -->
-        <div id="lookupTargetContainer" class="hidden w-full max-w-sm my-1 z-20">
+        <div id="lookupTargetContainer" class="hidden w-full max-w-sm my-1 z-20 pointer-events-none">
           <div id="lookupCard" class="py-2 px-3 rounded-2xl border-2 border-white/40 shadow-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 bg-red-600 text-white">
             <span id="lookupPromptSubtext" class="text-[9px] font-black bg-black/50 px-2 py-0.5 rounded-full text-white tracking-wider flex items-center gap-1">
               <span>👀</span> <span id="lookupPromptLabel">声に出して言おう！</span>
@@ -486,13 +553,13 @@
         </div>
 
         <!-- 目線促し（ルックアップ）明滅バナー -->
-        <div id="eyesBlinkBanner" class="hidden z-20 my-1 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-400 text-purple-300 text-xs font-black items-center gap-1.5 shadow-lg eyes-flash-anim">
+        <div id="eyesBlinkBanner" class="hidden z-20 my-1 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-400 text-purple-300 text-xs font-black items-center gap-1.5 shadow-lg eyes-flash-anim pointer-events-none">
           <span class="text-base">👀</span>
           <span>めせん！前をみよう！</span>
         </div>
 
         <!-- Main Time Display with SVG Circular HP-Gauge Ring -->
-        <div class="relative my-auto py-1 z-10 flex items-center justify-center">
+        <div class="relative my-auto py-1 z-10 flex items-center justify-center pointer-events-none">
           <svg id="timerRingSvg" class="w-52 h-52 sm:w-64 sm:h-64 pointer-events-none drop-shadow-lg" viewBox="0 0 200 200">
             <circle cx="100" cy="100" r="86" stroke="#202024" stroke-width="12" fill="none" />
             <circle id="hpRingCircle" class="hp-ring-circle" cx="100" cy="100" r="86" stroke="#10B981" stroke-width="12" stroke-linecap="round" fill="none" stroke-dasharray="540.35" stroke-dashoffset="0" />
@@ -508,22 +575,14 @@
           </div>
         </div>
 
-        <!-- 横画面用サイド情報コンテナ -->
-        <div id="landscapeSidePanel" class="hidden z-10 text-center">
-          <div class="bg-zinc-950/80 px-3 py-2 rounded-xl border border-zinc-800">
-            <span class="text-[10px] text-zinc-400 font-bold block">残りセット</span>
-            <span id="landscapeRemainingSets" class="text-lg font-black text-amber-400">5</span>
-          </div>
-        </div>
-
         <!-- Dynamic Linear Progress Bar -->
-        <div class="w-full bg-zinc-850 h-2.5 rounded-full mt-2 overflow-hidden z-10 border border-zinc-700/60">
+        <div class="w-full bg-zinc-850 h-2.5 rounded-full mt-2 overflow-hidden z-10 border border-zinc-700/60 pointer-events-none">
           <div id="timerProgressBar" class="h-full bg-emerald-500 transition-all duration-300 w-full rounded-full"></div>
         </div>
       </div>
 
-      <!-- Audio Toggles & Repeat Set Row -->
-      <div class="flex items-center justify-between bg-zinc-900/90 border border-zinc-800 px-3.5 py-2 rounded-xl">
+      <!-- Audio Toggles & Repeat Set Row (横画面時は非表示) -->
+      <div id="timerSubControlBar" class="flex items-center justify-between bg-zinc-900/90 border border-zinc-800 px-3.5 py-2 rounded-xl">
         <label class="flex items-center gap-1.5 cursor-pointer">
           <input type="checkbox" id="bgmToggle" checked class="sr-only peer">
           <div class="w-8 h-4.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-emerald-500 relative"></div>
@@ -538,8 +597,8 @@
         </button>
       </div>
 
-      <!-- Main Action Buttons -->
-      <div class="grid grid-cols-3 gap-2">
+      <!-- Main Action Buttons (横画面時は非表示) -->
+      <div id="timerControlsRow" class="grid grid-cols-3 gap-2">
         <button onclick="stopTimer()" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-300 font-bold py-3.5 rounded-xl border border-zinc-700 transition flex flex-col items-center justify-center">
           <span class="text-base">⏹</span>
           <span class="text-[10px] mt-0.5">リセット</span>
@@ -925,7 +984,7 @@
             保存する 💾
           </button>
         </div>
-        <!-- スタンプ削除（取り消し）ボタン（スタンプ済の日付でのみ表示） -->
+        <!-- スタンプ取り消しボタン -->
         <button type="button" id="deleteStampBtn" onclick="deleteCurrentDateStamp()" class="hidden w-full py-2 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-500/40 text-red-300 font-bold text-[11px] items-center justify-center gap-1 transition">
           <span>🗑</span>
           <span>この日のスタンプを取り消す</span>
@@ -1246,11 +1305,6 @@
 
     async function enterFullscreenMode() {
       isFullscreenMode = true;
-      const viewActive = document.getElementById('viewTimerActive');
-      if (viewActive) {
-        viewActive.classList.add('fixed', 'inset-0', 'z-50', 'bg-brandDark', 'p-3', 'sm:p-6', 'max-w-none');
-      }
-      
       const fsIcon = document.getElementById('fsIcon');
       const fsText = document.getElementById('fsText');
       if (fsIcon) fsIcon.innerText = '✕';
@@ -1268,11 +1322,6 @@
 
     function exitFullscreenMode() {
       isFullscreenMode = false;
-      const viewActive = document.getElementById('viewTimerActive');
-      if (viewActive) {
-        viewActive.classList.remove('fixed', 'inset-0', 'z-50', 'bg-brandDark', 'max-w-none');
-      }
-
       const fsIcon = document.getElementById('fsIcon');
       const fsText = document.getElementById('fsText');
       if (fsIcon) fsIcon.innerText = '⛶';
@@ -1295,6 +1344,76 @@
       }
     }
 
+    // ==========================================
+    // 横画面タップジェスチャー操作 (シングル／ダブルタップ)
+    // ==========================================
+    let tapCount = 0;
+    let tapTimeout = null;
+
+    function handleTimerCardTap(event) {
+      // ボタン等の子要素タップ時は除外
+      if (event && event.target && event.target.closest('button, input, label')) {
+        return;
+      }
+
+      tapCount++;
+      if (tapCount === 1) {
+        tapTimeout = setTimeout(() => {
+          // シングルタップ判定: 一時停止 / 再開
+          tapCount = 0;
+          executeSingleTapAction();
+        }, 260);
+      } else if (tapCount === 2) {
+        // ダブルタップ判定: リセット
+        clearTimeout(tapTimeout);
+        tapCount = 0;
+        executeDoubleTapAction();
+      }
+    }
+
+    function executeSingleTapAction() {
+      getAudioContext();
+      if (timerState.status === 'running') {
+        pauseTimer();
+        showTapHUD('⏸', '一時停止中', '#F59E0B');
+      } else if (timerState.status === 'paused') {
+        resumeTimer();
+        showTapHUD('▶', '再開！', '#10B981');
+      } else {
+        startTimerFresh();
+        showTapHUD('▶', 'スタート！', '#10B981');
+      }
+    }
+
+    function executeDoubleTapAction() {
+      stopTimer();
+      showTapHUD('⏹', 'リセット完了', '#3B82F6');
+      playBeep(false);
+    }
+
+    function showTapHUD(icon, text, borderColor) {
+      const hud = document.getElementById('tapFeedbackHUD');
+      const hIcon = document.getElementById('hudIcon');
+      const hText = document.getElementById('hudText');
+      if (!hud || !hIcon || !hText) return;
+
+      hIcon.innerText = icon;
+      hText.innerText = text;
+      hud.style.borderColor = borderColor;
+
+      hud.classList.remove('hidden', 'hud-popup-anim');
+      void hud.offsetWidth; // リフロー発生でアニメーションリセット
+      hud.classList.add('hud-popup-anim');
+
+      setTimeout(() => {
+        hud.classList.add('hidden');
+        hud.classList.remove('hud-popup-anim');
+      }, 850);
+    }
+
+    // ==========================================
+    // LOOK-UP / AVATAR / STORAGE VARIABLES
+    // ==========================================
     let isLookupModeActive = false;
     let lookupIntervalId = null;
     let currentLookupCategory = 'mix';
@@ -1516,12 +1635,6 @@
       localStorage.setItem('bukatsu_lookup_category', category);
       updateLookupCategoryButtonsUI();
       playBeep(true);
-    }
-
-    function setLookupInterval(sec) {
-      const input = document.getElementById('inputLookupInterval');
-      if (input) input.value = sec;
-      onLookupIntervalInput();
     }
 
     function onLookupIntervalInput() {
@@ -2076,6 +2189,9 @@
       playBeep(true);
     }
 
+    // ==========================================
+    // TIMER EXECUTION ENGINE
+    // ==========================================
     const STORAGE_KEY_SETTINGS = 'bukatsu_timer_settings';
     const STORAGE_KEY_STAMPS = 'bukatsu_stamps_v1';
     const STORAGE_KEY_WORKTIME = 'bukatsu_accumulated_seconds';
@@ -2225,7 +2341,7 @@
       if (curSet) curSet.innerText = '1';
       if (numElem) numElem.innerText = timerState.settings.prep;
       if (pBadge) pBadge.innerText = '準備完了';
-      if (pGuide) pGuide.innerText = 'スタートを押して始めよう！';
+      if (pGuide) pGuide.innerText = 'タップまたはスタートで開始！';
       if (bar) bar.style.width = '100%';
       if (retryBtn) retryBtn.disabled = true;
 
@@ -2253,8 +2369,6 @@
       if (retryBtn) retryBtn.disabled = false;
       requestWakeLock();
 
-      enterFullscreenMode();
-
       updateStartPauseUI(true);
       enterPhase('prep');
       runTimerLoop();
@@ -2268,7 +2382,7 @@
       stopLookupLoop();
       updateStartPauseUI(false);
       const guide = document.getElementById('phaseGuideText');
-      if (guide) guide.innerText = '一時停止中';
+      if (guide) guide.innerText = '一時停止中（タップで再開）';
     }
 
     function resumeTimer() {
@@ -2364,11 +2478,6 @@
         stopLookupLoop();
         stopEyesBlinkLoop();
         speak('休憩！');
-      }
-
-      const lsRemaining = document.getElementById('landscapeRemainingSets');
-      if (lsRemaining) {
-        lsRemaining.innerText = Math.max(0, timerState.settings.sets - timerState.currentSet + 1);
       }
 
       updateTimerDisplay();
@@ -2530,6 +2639,9 @@
       }
     }
 
+    // ==========================================
+    // STAMP BOOK & CALENDAR ENGINE
+    // ==========================================
     function getTodayKey() {
       const now = new Date();
       const y = now.getFullYear();
@@ -2630,10 +2742,6 @@
           openPraiseAndMemoModal(dateKey);
         }, 300);
       }
-    }
-
-    function selectGoodJobTag(tag) {
-      return tag;
     }
 
     function updateTodayStampButton() {
@@ -3167,6 +3275,9 @@
       }
     }
 
+    // ==========================================
+    // INITIALIZATION & LIFECYCLE HOOKS
+    // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       const today = new Date();
       calendarViewYear = today.getFullYear();
@@ -3190,7 +3301,7 @@
       updateLookupCategoryButtonsUI();
       updateLookupBadgeUI();
 
-      // Initialize multiple custom presets
+      // Initialize custom presets
       const activePreset = getActivePreset();
       currentActivePresetId = activePreset.id;
 
