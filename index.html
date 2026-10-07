@@ -74,7 +74,6 @@
       transform: rotate(-90deg);
       transform-origin: 50% 50%;
     }
-    /* タップフィードバックHUDアニメーション */
     @keyframes hud-fade {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
       20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
@@ -86,10 +85,9 @@
     }
 
     /* ======================================================== */
-    /* 横画面（ランドスケープ）専用: タイマー部分のみの完全全画面表示 */
+    /* 横画面（ランドスケープ）: タイマーカードを横画面全体にワイド表示 */
     /* ======================================================== */
     @media (orientation: landscape) and (max-height: 560px) {
-      /* 1. 最上部ヘッダー（ロゴ、タブナビ）を完全に消去 */
       #appHeader {
         display: none !important;
       }
@@ -104,7 +102,6 @@
         padding: 0 !important;
         margin: 0 !important;
       }
-      /* 2. タイマー画面を画面100%のキャンバスへ全面拡張 */
       #viewTimerActive {
         position: fixed !important;
         inset: 0 !important;
@@ -121,41 +118,46 @@
         min-height: 100vh !important;
         border-radius: 0 !important;
         border: none !important;
-        padding: 0 !important;
+        padding: 10px 24px !important;
         margin: 0 !important;
         display: flex !important;
         flex-direction: column !important;
+        justify-content: space-between !important;
         align-items: center !important;
-        justify-content: center !important;
-        background: transparent !important;
+        box-sizing: border-box !important;
       }
-      /* 3. 最上部の操作ガイドバー、フェーズバッジ、セット数、案内テキスト、ボタン類をすべて消去 */
-      #landscapeGuideBar,
-      #timerCardHeader,
-      #phaseGuideText,
-      #timerControlsRow,
-      #timerSubControlBar,
       #timerTopStandardBar,
-      #timerProgressBar,
-      #eyesBlinkBanner,
-      #lookupTargetContainer {
+      #timerControlsRow,
+      #timerSubControlBar {
         display: none !important;
       }
-      /* 4. タイマー数字とリングゲージのみを画面中央に超特大化 */
+      #timerCardHeader {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        z-index: 20 !important;
+      }
       #timerRingWrapper {
-        margin: 0 auto !important;
+        margin: auto 0 !important;
         padding: 0 !important;
       }
       #timerRingSvg {
-        width: min(88vh, 88vw) !important;
-        height: min(88vh, 88vw) !important;
+        width: min(58vh, 58vw) !important;
+        height: min(58vh, 58vw) !important;
       }
       #timerNumber {
-        font-size: min(38vh, 10rem) !important;
+        font-size: min(22vh, 5.5rem) !important;
         line-height: 1 !important;
-        font-weight: 900 !important;
       }
-      /* 5. 邪魔にならない画面右上端の極小・半透明の退出ボタンのみ控えめに表示 */
+      #phaseGuideText {
+        font-size: min(3vh, 0.85rem) !important;
+        margin-top: 2px !important;
+      }
+      #timerProgressBar {
+        width: 100% !important;
+        margin-top: auto !important;
+      }
       #minimalLandscapeExitBtn {
         display: flex !important;
       }
@@ -165,7 +167,7 @@
 <body class="bg-brandDark text-white font-sans min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black">
 
   <!-- ========================================== -->
-  <!-- TOP NAVIGATION HEADER (横画面時は完全非表示) -->
+  <!-- TOP NAVIGATION HEADER                      -->
   <!-- ========================================== -->
   <header id="appHeader" class="sticky top-0 z-30 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80 px-3 sm:px-4 py-2.5">
     <div class="max-w-md mx-auto flex items-center justify-between">
@@ -487,7 +489,7 @@
     <!-- ========================================== -->
     <div id="viewTimerActive" class="hidden flex-1 flex flex-col space-y-3">
       
-      <!-- Top Standard Bar (縦画面時のみ表示・横画面時は完全非表示) -->
+      <!-- Top Standard Bar (縦画面時のみ表示) -->
       <div id="timerTopStandardBar" class="flex items-center justify-between">
         <button onclick="leaveCountdownScreen()" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition flex items-center gap-1 border border-zinc-700">
           <span>‹</span>
@@ -509,13 +511,13 @@
         </div>
       </div>
 
-      <!-- 横画面専用: 右上端の極小・半透明の退出ボタン（視界の邪魔にならない配置） -->
-      <button id="minimalLandscapeExitBtn" onclick="leaveCountdownScreen()" class="hidden fixed top-3 right-3 z-50 px-2.5 py-1 rounded-lg bg-zinc-900/60 hover:bg-zinc-800/90 text-zinc-400 hover:text-white text-[11px] font-bold border border-zinc-700/50 backdrop-blur-sm opacity-25 hover:opacity-100 transition-opacity flex items-center gap-1">
-        ✕
+      <!-- 横画面専用: 右上端の終了ボタン -->
+      <button id="minimalLandscapeExitBtn" onclick="leaveCountdownScreen()" class="hidden fixed top-3 right-3 z-50 px-2.5 py-1 rounded-lg bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white text-[11px] font-bold border border-zinc-700 backdrop-blur-sm transition flex items-center gap-1 shadow-lg">
+        ✕ 終了
       </button>
 
-      <!-- Visual Giant Display Board (画面全体がタップジェスチャー領域) -->
-      <div id="timerCard" onclick="handleTimerCardTap(event)" class="relative rounded-3xl p-5 sm:p-6 bg-zinc-900 border-2 border-zinc-800 transition-all duration-500 shadow-2xl flex flex-col items-center justify-center flex-1 min-h-[350px] overflow-hidden cursor-pointer select-none">
+      <!-- Visual Giant Display Board (タップジェスチャー対応) -->
+      <div id="timerCard" onclick="handleTimerCardTap(event)" class="relative rounded-3xl p-5 sm:p-6 bg-zinc-900 border-2 border-zinc-800 transition-all duration-500 shadow-2xl flex flex-col items-center justify-between flex-1 min-h-[350px] overflow-hidden cursor-pointer select-none">
         
         <!-- Ambient Background Glow -->
         <div id="ambientGlow" class="absolute inset-0 bg-transparent opacity-30 transition-all duration-700 pointer-events-none"></div>
@@ -526,7 +528,7 @@
           <span id="hudText" class="text-base sm:text-xl font-black text-white tracking-wider">一時停止中</span>
         </div>
 
-        <!-- Header: Phase Badge and Set Counter (縦画面のみ表示・横画面時は完全非表示) -->
+        <!-- Header: Phase Badge and Set Counter -->
         <div id="timerCardHeader" class="w-full flex items-center justify-between z-10 mb-1 pointer-events-none">
           <div class="flex items-center gap-1.5">
             <span id="phaseBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 transition-all shadow">
@@ -543,13 +545,13 @@
           </div>
         </div>
 
-        <!-- Look-Up Target Box (縦画面用) -->
+        <!-- Look-Up Target Box (視野確保モード実行時にお題を表示) -->
         <div id="lookupTargetContainer" class="hidden w-full max-w-sm my-1 z-20 pointer-events-none">
-          <div id="lookupCard" class="py-2 px-3 rounded-2xl border-2 border-white/40 shadow-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 bg-red-600 text-white">
-            <span id="lookupPromptSubtext" class="text-[9px] font-black bg-black/50 px-2 py-0.5 rounded-full text-white tracking-wider flex items-center gap-1">
+          <div id="lookupCard" class="py-2.5 px-4 rounded-2xl border-2 border-white/40 shadow-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 bg-red-600 text-white">
+            <span id="lookupPromptSubtext" class="text-[10px] font-black bg-black/50 px-2.5 py-0.5 rounded-full text-white tracking-wider flex items-center gap-1">
               <span>👀</span> <span id="lookupPromptLabel">声に出して言おう！</span>
             </span>
-            <div id="lookupTargetText" class="text-xl sm:text-2xl font-black tracking-tight text-center">🦁 ライオン！</div>
+            <div id="lookupTargetText" class="text-2xl sm:text-3xl font-black tracking-tight text-center mt-0.5">🦁 ライオン！</div>
           </div>
         </div>
 
@@ -559,7 +561,7 @@
           <span>めせん！前をみよう！</span>
         </div>
 
-        <!-- Main Time Display with SVG Circular HP-Gauge Ring (横画面時はこれが画面全面に表示) -->
+        <!-- Main Time Display with SVG Circular HP-Gauge Ring -->
         <div id="timerRingWrapper" class="relative my-auto py-1 z-10 flex items-center justify-center pointer-events-none">
           <svg id="timerRingSvg" class="w-52 h-52 sm:w-64 sm:h-64 pointer-events-none drop-shadow-lg" viewBox="0 0 200 200">
             <circle cx="100" cy="100" r="86" stroke="#202024" stroke-width="12" fill="none" />
@@ -571,18 +573,18 @@
               10
             </div>
             <div id="phaseGuideText" class="text-xs font-bold text-zinc-300 tracking-wide mt-1 text-center">
-              スタートを押して始めよう！
+              タップまたはスタートで開始！
             </div>
           </div>
         </div>
 
-        <!-- Dynamic Linear Progress Bar (縦画面のみ) -->
+        <!-- Dynamic Linear Progress Bar -->
         <div id="timerProgressBar" class="w-full bg-zinc-850 h-2.5 rounded-full mt-2 overflow-hidden z-10 border border-zinc-700/60 pointer-events-none">
           <div class="h-full bg-emerald-500 transition-all duration-300 w-full rounded-full"></div>
         </div>
       </div>
 
-      <!-- Audio Toggles & Repeat Set Row (縦画面のみ・横画面時は完全非表示) -->
+      <!-- Audio Toggles & Repeat Set Row (縦画面のみ) -->
       <div id="timerSubControlBar" class="flex items-center justify-between bg-zinc-900/90 border border-zinc-800 px-3.5 py-2 rounded-xl">
         <label class="flex items-center gap-1.5 cursor-pointer">
           <input type="checkbox" id="bgmToggle" checked class="sr-only peer">
@@ -598,7 +600,7 @@
         </button>
       </div>
 
-      <!-- Main Action Buttons (縦画面のみ・横画面時は完全非表示) -->
+      <!-- Main Action Buttons (縦画面のみ) -->
       <div id="timerControlsRow" class="grid grid-cols-3 gap-2">
         <button onclick="stopTimer()" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-300 font-bold py-3.5 rounded-xl border border-zinc-700 transition flex flex-col items-center justify-center">
           <span class="text-base">⏹</span>
@@ -620,7 +622,6 @@
       
       <!-- 1. TOP CALENDAR COMPONENT -->
       <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl sm:rounded-3xl p-3.5 shadow-xl space-y-2.5">
-        <!-- Calendar Mode Switcher & Period Title -->
         <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
           <div>
             <div class="flex items-center gap-1.5">
@@ -851,7 +852,7 @@
     </div>
   </div>
 
-  <!-- MODAL: FINISH CELEBRATION -->
+  <!-- MODAL: FINISH CELEBRATION (SELF-PRAISE STEP) -->
   <div id="finishModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5">
     <div class="bg-zinc-900 border-2 border-emerald-500 rounded-3xl p-5 max-w-xs w-full text-center space-y-3 shadow-2xl relative">
       <div class="text-4xl">🏀</div>
@@ -1589,7 +1590,7 @@
         { bg: 'bg-sky-600', border: 'border-sky-300' },
         { bg: 'bg-indigo-600', border: 'border-indigo-300' },
         { bg: 'bg-purple-600', border: 'border-purple-300' },
-        { bg: 'bg-teal-600', border: 'border-teal-300' }
+        { bg: 'teal-600', border: 'border-teal-300' }
       ];
       const colorPick = bgColors[Math.floor(Math.random() * bgColors.length)];
 
@@ -1745,7 +1746,7 @@
       const promptElem = document.getElementById('lookupPromptLabel');
       if (!card || !textElem) return;
 
-      card.className = `py-2 px-3 rounded-2xl border-2 shadow-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 text-white lookup-active-anim ${target.bgClass} ${target.borderClass}`;
+      card.className = `py-2.5 px-4 rounded-2xl border-2 shadow-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 text-white lookup-active-anim ${target.bgClass} ${target.borderClass}`;
       textElem.innerText = target.text;
       if (promptElem && target.prompt) {
         promptElem.innerText = target.prompt;
