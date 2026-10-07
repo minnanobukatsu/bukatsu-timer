@@ -191,10 +191,10 @@
   <!-- TOP NAVIGATION HEADER (MOBILE OPTIMIZED)   -->
   <!-- ========================================== -->
   <header id="appHeader" class="sticky top-0 z-30 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800/80 px-2.5 sm:px-4 py-2">
-    <div class="max-w-md mx-auto flex items-center justify-between gap-2">
+    <div class="max-w-md mx-auto flex items-center justify-between gap-1.5 sm:gap-2">
       <!-- BUKATSU NEXT Brand Logo -->
-      <button type="button" onclick="goToTimerSettingsTab()" class="flex items-center gap-1.5 text-left cursor-pointer hover:opacity-90 active:scale-95 transition-transform no-select focus:outline-none shrink-0" title="ホーム画面にもどる">
-        <svg class="w-7 h-7 sm:w-8 sm:h-8 shrink-0 drop-shadow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <button type="button" onclick="goToTimerSettingsTab()" class="flex items-center gap-1 text-left cursor-pointer hover:opacity-90 active:scale-95 transition-transform no-select focus:outline-none shrink-0" title="ホーム画面にもどる">
+        <svg class="w-6 h-6 sm:w-7 sm:h-7 shrink-0 drop-shadow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="44" cy="50" r="32" stroke="#1E293B" stroke-width="6.5" />
           <path d="M12 50H76" stroke="#1E293B" stroke-width="6.5" stroke-linecap="round" />
           <path d="M44 18V82" stroke="#1E293B" stroke-width="6.5" stroke-linecap="round" />
@@ -204,26 +204,35 @@
           <path d="M68 28 L84 50 L68 72" stroke="#10B981" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <div class="flex flex-col">
-          <div class="flex items-center tracking-tight leading-none font-black text-xs sm:text-sm text-white">
+          <div class="flex items-center tracking-tight leading-none font-black text-[11px] sm:text-xs text-white">
             <span>BUKATSU</span>
             <span class="text-amber-500 ml-1">NEXT</span>
-            <span class="text-emerald-500 font-bold ml-0.5 text-[11px]">&gt;&gt;</span>
+            <span class="text-emerald-500 font-bold ml-0.5">&gt;&gt;</span>
           </div>
-          <span class="text-[8px] text-zinc-400 font-medium tracking-wider">BASKETBALL CLINIC</span>
+          <span class="text-[7.5px] text-zinc-400 font-medium tracking-wider">BASKETBALL CLINIC</span>
         </div>
       </button>
 
-      <!-- Main Tabs (Timer / Stamp Book) - 1行で綺麗に収まる設計 -->
-      <nav class="flex items-center bg-zinc-900 p-0.5 rounded-xl border border-zinc-800 shrink-0">
-        <button id="navTimerBtn" onclick="goToTimerSettingsTab()" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-emerald-500 text-black shadow flex items-center gap-1 whitespace-nowrap shrink-0 leading-none">
-          <span class="text-xs">⏱</span>
-          <span>タイマー</span>
+      <!-- Right Group: Nav Tabs & Help Guide Button -->
+      <div class="flex items-center gap-1 shrink-0">
+        <!-- Main Tabs (Timer / Stamp Book) -->
+        <nav class="flex items-center bg-zinc-900 p-0.5 rounded-xl border border-zinc-800 shrink-0">
+          <button id="navTimerBtn" onclick="goToTimerSettingsTab()" class="px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-emerald-500 text-black shadow flex items-center gap-1 whitespace-nowrap shrink-0 leading-none">
+            <span class="text-xs">⏱</span>
+            <span>タイマー</span>
+          </button>
+          <button id="navStampBtn" onclick="switchMainTab('stamp')" class="px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-zinc-400 hover:text-white flex items-center gap-1 whitespace-nowrap shrink-0 leading-none">
+            <span class="text-xs">📅</span>
+            <span>スタンプ帳</span>
+          </button>
+        </nav>
+
+        <!-- Help Guide Trigger Button -->
+        <button type="button" onclick="openHelpGuideModal()" class="px-2 py-1.5 rounded-xl text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-amber-300 hover:text-amber-200 border border-zinc-800 flex items-center gap-0.5 shrink-0 transition active:scale-95 shadow-sm" title="使い方ガイドを見る">
+          <span class="text-xs">❓</span>
+          <span class="hidden sm:inline text-[11px]">使い方</span>
         </button>
-        <button id="navStampBtn" onclick="switchMainTab('stamp')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-zinc-400 hover:text-white flex items-center gap-1 whitespace-nowrap shrink-0 leading-none">
-          <span class="text-xs">📅</span>
-          <span>スタンプ帳</span>
-        </button>
-      </nav>
+      </div>
     </div>
   </header>
 
@@ -532,11 +541,6 @@
         </div>
       </div>
 
-      <!-- 横画面専用: 右上端の終了ボタン -->
-      <button id="minimalLandscapeExitBtn" onclick="leaveCountdownScreen()" class="hidden fixed top-3 right-3 z-50 px-2.5 py-1 rounded-lg bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white text-[11px] font-bold border border-zinc-700 backdrop-blur-sm transition flex items-center gap-1 shadow-lg">
-        ✕ 終了
-      </button>
-
       <!-- Visual Giant Display Board (タップジェスチャー対応) -->
       <div id="timerCard" onclick="handleTimerCardTap(event)" class="relative rounded-3xl p-5 sm:p-6 bg-zinc-900 border-2 border-zinc-800 transition-all duration-500 shadow-2xl flex flex-col items-center justify-between flex-1 min-h-[350px] overflow-hidden cursor-pointer select-none">
         
@@ -741,7 +745,7 @@
         </div>
       </div>
 
-      <!-- 4. OBSERVATION DIARY LOG BANNER (NEW FEATURE: DIARY LIST & COPY) -->
+      <!-- 4. OBSERVATION DIARY LOG BANNER (DIARY LIST & COPY) -->
       <div onclick="openDiaryListModal()" class="cursor-pointer bg-zinc-900/90 hover:bg-zinc-850 border border-emerald-500/40 hover:border-emerald-400 rounded-2xl p-2.5 shadow-md transition-all active:scale-98 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-emerald-950/50 border border-emerald-500/40 flex items-center justify-center text-xl shadow-inner shrink-0">
@@ -840,6 +844,98 @@
     </div>
 
   </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: HELP GUIDE (COMPREHENSIVE USAGE)    -->
+  <!-- ========================================== -->
+  <div id="helpGuideModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5">
+    <div class="bg-zinc-900 border-2 border-amber-500/80 rounded-3xl p-4 sm:p-5 max-w-md w-full space-y-3.5 shadow-2xl flex flex-col max-h-[88vh]">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+        <div class="flex items-center gap-1.5">
+          <span class="text-xl">📖</span>
+          <div>
+            <h3 class="text-xs sm:text-sm font-black text-white">BUKATSU NEXT アプリ使い方ガイド</h3>
+            <p class="text-[9px] text-zinc-400">自主トレを楽しく続けられる便利機能のご案内</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeHelpGuideModal()" class="text-zinc-400 hover:text-white p-1 text-sm font-bold">✕</button>
+      </div>
+
+      <!-- Scrollable Help Body -->
+      <div class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs text-zinc-300 leading-relaxed">
+        
+        <!-- Step 1: Timer & Presets -->
+        <div class="bg-zinc-950 p-3 rounded-2xl border border-zinc-800 space-y-1.5">
+          <div class="flex items-center gap-1.5 text-emerald-400 font-black">
+            <span class="text-sm">⏱</span>
+            <span class="text-xs">1. タイマー設定とマイ・メニュー</span>
+          </div>
+          <p class="text-[11px] text-zinc-300">
+            • <b>1秒刻み調整</b>: 準備・トレーニング・休憩・セット数を「＋」「−」ボタンで1秒単位で自由に微調整できます。<br>
+            • <b>マイ・メニュー一覧</b>: 「朝のサクッと用」「休日じっくり用」など、好みの秒数を何個でも登録・ストックしてワンタップで呼び出せます。
+          </p>
+        </div>
+
+        <!-- Step 2: Landscape & Touch Gesture -->
+        <div class="bg-zinc-950 p-3 rounded-2xl border border-zinc-800 space-y-1.5">
+          <div class="flex items-center gap-1.5 text-blue-400 font-black">
+            <span class="text-sm">📱</span>
+            <span class="text-xs">2. スマホ横画面（全画面スコアボード）</span>
+          </div>
+          <p class="text-[11px] text-zinc-300">
+            • スマホを横向きにすると、体育館やリビングの遠くからでも見やすい<b>巨大タイマー表示</b>に自動切り替え！<br>
+            • <b>タップ操作</b>: 画面を<b>1回タップ</b>で一時停止/再開、素早く<b>2回タップ</b>でリセットできます。
+          </p>
+        </div>
+
+        <!-- Step 3: Look-Up Vision Mode -->
+        <div class="bg-zinc-950 p-3 rounded-2xl border border-zinc-800 space-y-1.5">
+          <div class="flex items-center gap-1.5 text-purple-400 font-black">
+            <span class="text-sm">👀</span>
+            <span class="text-xs">3. ルックアップ（視野確保）モード</span>
+          </div>
+          <p class="text-[11px] text-zinc-300">
+            • ボールを見ずに前を向いてドリブルする習慣が身につく機能です。<br>
+            • トレーニング中、指定した秒数（例: 3秒）ごとにお題（動物の絵文字、かんたんな計算、カラー）が切り替わります。画面のお題を<b>声に出しながら</b>練習しましょう！
+          </p>
+        </div>
+
+        <!-- Step 4: Stamp Book & Observation Diary -->
+        <div class="bg-zinc-950 p-3 rounded-2xl border border-zinc-800 space-y-1.5">
+          <div class="flex items-center gap-1.5 text-amber-400 font-black">
+            <span class="text-sm">📅</span>
+            <span class="text-xs">4. スタンプ帳 ＆ 観察日記（親のメモ）</span>
+          </div>
+          <p class="text-[11px] text-zinc-300">
+            • 練習が終わったら「きょうのスタンプを押す！」をタップ！毎回ファンファーレと紙吹雪が舞います。<br>
+            • <b>観察日記</b>: カレンダーの日付を押すと「ドリブルが低くなった！」など親のひとこと成長メモを残せます。<br>
+            • <b>一括コピー</b>: 書いた日記は「記録一覧」からまとめてLINE等にコピーしてコーチやおうちの人に共有できます。<br>
+            • <b>取り消し</b>: スタンプを誤って押した時は、その日付を押して「スタンプを取り消す」でいつでも元に戻せます。
+          </p>
+        </div>
+
+        <!-- Step 5: Locker Room & Badges -->
+        <div class="bg-zinc-950 p-3 rounded-2xl border border-zinc-800 space-y-1.5">
+          <div class="flex items-center gap-1.5 text-pink-400 font-black">
+            <span class="text-sm">🎽</span>
+            <span class="text-xs">5. バスケ着せ替えロッカー ＆ 称号</span>
+          </div>
+          <p class="text-[11px] text-zinc-300">
+            • スタンプを貯めると「漆黒ボール」「NEXTユニ」「黄金バッシュ」など新しい装備が解放されます。<br>
+            • 着せ替えても<b>過去に押した日のスタンプは当時のまま残る</b>ので、成長の軌跡を振り返ることができます！
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Close Button -->
+      <div class="pt-2 border-t border-zinc-800/80">
+        <button type="button" onclick="closeHelpGuideModal()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-black text-xs rounded-xl transition shadow-md">
+          理解できた！とじる ✨
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ========================================== -->
   <!-- MODAL: MY PRESET LIST (POPUP SELECTION)    -->
@@ -1842,6 +1938,17 @@
     }
 
     let currentModalTargetDateKey = '';
+
+    function openHelpGuideModal() {
+      const modal = document.getElementById('helpGuideModal');
+      if (modal) modal.classList.remove('hidden');
+      playBeep(true);
+    }
+
+    function closeHelpGuideModal() {
+      const modal = document.getElementById('helpGuideModal');
+      if (modal) modal.classList.add('hidden');
+    }
 
     function openPraiseAndMemoModal(dateKey) {
       currentModalTargetDateKey = dateKey || getTodayKey();
@@ -3456,8 +3563,8 @@
         if (viewTimerActive) viewTimerActive.classList.add('hidden');
         if (viewStamp) viewStamp.classList.add('hidden');
 
-        if (btnTimer) btnTimer.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-emerald-500 text-black shadow flex items-center gap-1 whitespace-nowrap shrink-0 leading-none';
-        if (btnStamp) btnStamp.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-zinc-400 hover:text-white flex items-center gap-1 whitespace-nowrap shrink-0 leading-none';
+        if (btnTimer) btnTimer.className = 'px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-emerald-500 text-black shadow flex items-center gap-1 whitespace-nowrap shrink-0 leading-none';
+        if (btnStamp) btnStamp.className = 'px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-zinc-400 hover:text-white flex items-center gap-1 whitespace-nowrap shrink-0 leading-none';
       } else {
         if (timerState.status === 'running') {
           pauseTimer();
@@ -3466,8 +3573,8 @@
         if (viewTimerActive) viewTimerActive.classList.add('hidden');
         if (viewStamp) viewStamp.classList.remove('hidden');
 
-        if (btnStamp) btnStamp.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-emerald-500 text-black shadow flex items-center gap-1 whitespace-nowrap shrink-0 leading-none';
-        if (btnTimer) btnTimer.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-zinc-400 hover:text-white flex items-center gap-1 whitespace-nowrap shrink-0 leading-none';
+        if (btnStamp) btnStamp.className = 'px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-emerald-500 text-black shadow flex items-center gap-1 whitespace-nowrap shrink-0 leading-none';
+        if (btnTimer) btnTimer.className = 'px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-zinc-400 hover:text-white flex items-center gap-1 whitespace-nowrap shrink-0 leading-none';
 
         renderCalendar();
         updateGamificationStats();
