@@ -84,9 +84,6 @@
       animation: hud-fade 0.85s ease-out forwards;
     }
 
-    /* ======================================================== */
-    /* 横画面（ランドスケープ）: タイマーカードを横画面全体にワイド表示 */
-    /* ======================================================== */
     @media (orientation: landscape) and (max-height: 560px) {
       #appHeader {
         display: none !important;
@@ -118,7 +115,7 @@
         min-height: 100vh !important;
         border-radius: 0 !important;
         border: none !important;
-        padding: 10px 24px !important;
+        padding: 8px 24px !important;
         margin: 0 !important;
         display: flex !important;
         flex-direction: column !important;
@@ -143,20 +140,21 @@
         padding: 0 !important;
       }
       #timerRingSvg {
-        width: min(58vh, 58vw) !important;
-        height: min(58vh, 58vw) !important;
+        width: min(54vh, 54vw) !important;
+        height: min(54vh, 54vw) !important;
       }
       #timerNumber {
-        font-size: min(22vh, 5.5rem) !important;
+        font-size: min(20vh, 5.2rem) !important;
         line-height: 1 !important;
       }
       #phaseGuideText {
-        font-size: min(3vh, 0.85rem) !important;
+        font-size: min(2.8vh, 0.8rem) !important;
         margin-top: 2px !important;
       }
       #timerProgressBar {
         width: 100% !important;
         margin-top: auto !important;
+        margin-bottom: 2px !important;
       }
       #minimalLandscapeExitBtn {
         display: flex !important;
@@ -183,17 +181,17 @@
           <path d="M68 28 L84 50 L68 72" stroke="#10B981" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <div class="flex flex-col">
-          <div class="flex items-center tracking-tight leading-none font-black text-sm sm:text-base text-white">
+          <div class="flex items-center tracking-tight leading-none font-black text-xs sm:text-sm text-white">
             <span>BUKATSU</span>
             <span class="text-amber-500 ml-1">NEXT</span>
-            <span class="text-emerald-500 font-bold ml-0.5 text-xs">&gt;&gt;</span>
+            <span class="text-emerald-500 font-bold ml-0.5 text-[11px]">&gt;&gt;</span>
           </div>
           <span class="text-[8px] text-zinc-400 font-medium tracking-wider">BASKETBALL CLINIC</span>
         </div>
       </button>
 
       <!-- Main Tabs (Timer / Stamp Book) - 1行で綺麗に収まる設計 -->
-      <nav class="flex items-center bg-zinc-900 p-0.5 sm:p-1 rounded-xl border border-zinc-800 shrink-0">
+      <nav class="flex items-center bg-zinc-900 p-0.5 rounded-xl border border-zinc-800 shrink-0">
         <button id="navTimerBtn" onclick="goToTimerSettingsTab()" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-emerald-500 text-black shadow flex items-center gap-1 whitespace-nowrap shrink-0 leading-none">
           <span class="text-xs">⏱</span>
           <span>タイマー</span>
@@ -578,9 +576,9 @@
           </div>
         </div>
 
-        <!-- Dynamic Linear Progress Bar -->
-        <div id="timerProgressBar" class="w-full bg-zinc-850 h-2.5 rounded-full mt-2 overflow-hidden z-10 border border-zinc-700/60 pointer-events-none">
-          <div class="h-full bg-emerald-500 transition-all duration-300 w-full rounded-full"></div>
+        <!-- Dynamic Linear Progress Bar (横画面でも内部が伸縮動作) -->
+        <div id="timerProgressBar" class="w-full bg-zinc-850 h-2.5 rounded-full mt-2 overflow-hidden z-10 border border-zinc-700/60 pointer-events-none relative">
+          <div id="timerProgressFill" class="h-full bg-emerald-500 transition-all duration-300 w-full rounded-full"></div>
         </div>
       </div>
 
@@ -711,7 +709,29 @@
         </div>
       </div>
 
-      <!-- 4. GAMIFICATION STATS COUNTERS -->
+      <!-- 4. OBSERVATION DIARY LOG BANNER (NEW FEATURE: DIARY LIST & COPY) -->
+      <div onclick="openDiaryListModal()" class="cursor-pointer bg-zinc-900/90 hover:bg-zinc-850 border border-emerald-500/40 hover:border-emerald-400 rounded-2xl p-2.5 shadow-md transition-all active:scale-98 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-950/50 border border-emerald-500/40 flex items-center justify-center text-xl shadow-inner shrink-0">
+            <span>📝</span>
+          </div>
+          <div class="truncate">
+            <div class="flex items-center gap-1.5 truncate">
+              <span class="text-xs font-black text-white truncate">観察日記の記録一覧</span>
+              <span id="diaryCountBadge" class="text-[8px] bg-emerald-950/70 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded font-bold shrink-0">0件</span>
+            </div>
+            <div class="text-[10px] text-zinc-400 mt-0.5 truncate">
+              書いた日記を一覧で見返したりコピー・共有 📋
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-zinc-950 px-2 py-1 rounded-lg border border-zinc-800 shrink-0">
+          <span>一覧</span>
+          <span>›</span>
+        </div>
+      </div>
+
+      <!-- 5. GAMIFICATION STATS COUNTERS -->
       <div class="grid grid-cols-3 gap-1.5 text-center">
         <!-- Total Stamps -->
         <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-2 flex flex-col justify-between">
@@ -747,7 +767,7 @@
         </div>
       </div>
 
-      <!-- 5. EVOLVING STAMP BADGES LIST -->
+      <!-- 6. EVOLVING STAMP BADGES LIST -->
       <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-2.5 space-y-1.5">
         <div class="flex items-center justify-between">
           <span class="text-[11px] font-black text-white flex items-center gap-1">
@@ -779,7 +799,7 @@
         </div>
       </div>
 
-      <!-- 6. DIGITAL AWARD BUTTON -->
+      <!-- 7. DIGITAL AWARD BUTTON -->
       <button onclick="checkMonthlyAward(true)" class="w-full py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 border border-amber-500/40 rounded-xl text-amber-400 text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
         <span>📜</span>
         <span>月間達成トロフィーカードを見る</span>
@@ -847,6 +867,46 @@
         </button>
         <button type="button" onclick="submitPresetEdit()" class="py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition">
           保存する ✨
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: OBSERVATION DIARY LOG LIST & EXPORT -->
+  <!-- ========================================== -->
+  <div id="diaryListModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5">
+    <div class="bg-zinc-900 border-2 border-emerald-500/80 rounded-3xl p-4 sm:p-5 max-w-md w-full space-y-3 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+        <div class="flex items-center gap-1.5">
+          <span class="text-lg">📝</span>
+          <div>
+            <h3 class="text-xs sm:text-sm font-black text-white">観察日記の記録一覧</h3>
+            <p class="text-[9px] text-zinc-400">日々の成長メモの振り返りとコピー</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeDiaryListModal()" class="text-zinc-400 hover:text-white p-1 text-sm font-bold">✕</button>
+      </div>
+
+      <!-- Action: Copy All Button -->
+      <div class="flex items-center justify-between bg-zinc-950 p-2.5 rounded-xl border border-zinc-800">
+        <div class="text-[10px] text-zinc-400">
+          全記録件数: <span id="diaryListTotalCount" class="font-bold text-emerald-400">0</span> 件
+        </div>
+        <button type="button" onclick="copyAllDiariesText()" class="text-[11px] font-black px-3 py-1.5 rounded-lg bg-emerald-500 text-black hover:bg-emerald-400 active:scale-95 transition flex items-center gap-1 shadow-sm">
+          <span>📋</span>
+          <span>すべて一括コピー</span>
+        </button>
+      </div>
+
+      <!-- Scrollable List of Diary Entries -->
+      <div id="diaryEntriesContainer" class="flex-1 overflow-y-auto space-y-2 pr-1">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <div class="pt-2 border-t border-zinc-800/80">
+        <button type="button" onclick="closeDiaryListModal()" class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs rounded-xl transition">
+          とじる
         </button>
       </div>
     </div>
@@ -1333,9 +1393,6 @@
       }
     }
 
-    // ==========================================
-    // 横画面タップジェスチャー操作 (シングル／ダブルタップ)
-    // ==========================================
     let tapCount = 0;
     let tapTimeout = null;
 
@@ -1397,9 +1454,6 @@
       }, 850);
     }
 
-    // ==========================================
-    // LOOK-UP / AVATAR / STORAGE VARIABLES
-    // ==========================================
     let isLookupModeActive = false;
     let lookupIntervalId = null;
     let currentLookupCategory = 'mix';
@@ -1821,9 +1875,143 @@
       showToast('メモを保存しました！', '📝');
     }
 
-    // ==========================================
-    // MULTIPLE CUSTOM PRESETS & POPUP SELECTION
-    // ==========================================
+    function openDiaryListModal() {
+      renderDiaryList();
+      const modal = document.getElementById('diaryListModal');
+      if (modal) modal.classList.remove('hidden');
+      playBeep(true);
+    }
+
+    function closeDiaryListModal() {
+      const modal = document.getElementById('diaryListModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function copyToClipboard(text, successMsg) {
+      if (!text) return;
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          showToast(successMsg || 'コピーしました！', '📋');
+          playBeep(true);
+        } else {
+          showToast('コピーに失敗しました', '⚠️');
+        }
+      } catch (err) {
+        showToast('コピーに失敗しました', '⚠️');
+      }
+    }
+
+    function copySingleDiaryText(dateKey, memo, avatarIcon) {
+      const formatted = `【BUKATSU NEXT 自主トレ日記】\n📅 日付: ${dateKey}\n${avatarIcon || '🏀'} メモ: ${memo}`;
+      copyToClipboard(formatted, `${dateKey}の記録をコピー！`);
+    }
+
+    function copyAllDiariesText() {
+      const stampData = getStampData();
+      const dates = Object.keys(stampData).sort().reverse();
+      const entries = dates
+        .filter(key => stampData[key] && stampData[key].memo)
+        .map(key => {
+          const item = stampData[key];
+          const icon = item.avatarIcon || (item.avatarKey && AVATARS[item.avatarKey]?.icon) || '🏀';
+          return `📅 ${key} ${icon}\n${item.memo}`;
+        });
+
+      if (entries.length === 0) {
+        showToast('コピーする日記がありません', '📝');
+        return;
+      }
+
+      const fullText = `【BUKATSU NEXT 自主トレ日記まとめ（全${entries.length}件）】\n\n` + entries.join('\n\n---\n\n');
+      copyToClipboard(fullText, `全${entries.length}件の日記を一括コピー！`);
+    }
+
+    function renderDiaryList() {
+      const container = document.getElementById('diaryEntriesContainer');
+      const countBadge = document.getElementById('diaryListTotalCount');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const stampData = getStampData();
+      const dates = Object.keys(stampData).sort().reverse();
+      const diaryList = dates
+        .filter(key => stampData[key] && stampData[key].memo && stampData[key].memo.trim() !== '')
+        .map(key => ({
+          dateKey: key,
+          ...stampData[key]
+        }));
+
+      if (countBadge) countBadge.innerText = diaryList.length;
+
+      if (diaryList.length === 0) {
+        container.innerHTML = `
+          <div class="py-10 text-center text-zinc-500 text-xs">
+            <span class="text-3xl block mb-2">📝</span>
+            まだ日記が記録されていません。<br>
+            カレンダーの日付をタップしてひとことメモを書こう！
+          </div>
+        `;
+        return;
+      }
+
+      diaryList.forEach(item => {
+        const icon = item.avatarIcon || (item.avatarKey && AVATARS[item.avatarKey]?.icon) || '🏀';
+        const card = document.createElement('div');
+        card.className = 'bg-zinc-950 border border-zinc-800 rounded-2xl p-3 flex flex-col justify-between gap-1.5 hover:border-zinc-700 transition shadow-sm';
+
+        const topRow = document.createElement('div');
+        topRow.className = 'flex items-center justify-between border-b border-zinc-900 pb-1.5';
+
+        const dateBox = document.createElement('div');
+        dateBox.className = 'flex items-center gap-1.5';
+        dateBox.innerHTML = `
+          <span class="text-lg">${icon}</span>
+          <span class="text-xs font-black text-amber-400 font-mono">${item.dateKey}</span>
+        `;
+
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'flex items-center gap-1';
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-1 rounded-lg border border-zinc-700 transition flex items-center gap-0.5';
+        editBtn.innerHTML = '<span>✏️</span><span>編集</span>';
+        editBtn.onclick = () => {
+          closeDiaryListModal();
+          openPraiseAndMemoModal(item.dateKey);
+        };
+
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'text-[10px] bg-emerald-950/80 hover:bg-emerald-900 text-emerald-400 px-2 py-1 rounded-lg border border-emerald-500/40 transition flex items-center gap-0.5 font-bold';
+        copyBtn.innerHTML = '<span>📋</span><span>コピー</span>';
+        copyBtn.onclick = () => copySingleDiaryText(item.dateKey, item.memo, icon);
+
+        btnGroup.appendChild(editBtn);
+        btnGroup.appendChild(copyBtn);
+        topRow.appendChild(dateBox);
+        topRow.appendChild(btnGroup);
+
+        const content = document.createElement('div');
+        content.className = 'text-xs text-zinc-200 leading-relaxed pl-1 whitespace-pre-wrap';
+        content.innerText = item.memo;
+
+        card.appendChild(topRow);
+        card.appendChild(content);
+        container.appendChild(card);
+      });
+    }
+
     const STORAGE_KEY_PRESETS_LIST = 'bukatsu_custom_presets_v2';
     const STORAGE_KEY_ACTIVE_PRESET_ID = 'bukatsu_active_preset_id_v2';
     let currentActivePresetId = '';
@@ -2173,9 +2361,6 @@
       playBeep(true);
     }
 
-    // ==========================================
-    // TIMER EXECUTION ENGINE
-    // ==========================================
     const STORAGE_KEY_SETTINGS = 'bukatsu_timer_settings';
     const STORAGE_KEY_STAMPS = 'bukatsu_stamps_v1';
     const STORAGE_KEY_WORKTIME = 'bukatsu_accumulated_seconds';
@@ -2315,7 +2500,7 @@
       const numElem = document.getElementById('timerNumber');
       const pBadge = document.getElementById('phaseBadge');
       const pGuide = document.getElementById('phaseGuideText');
-      const bar = document.getElementById('timerProgressBar');
+      const fill = document.getElementById('timerProgressFill');
       const retryBtn = document.getElementById('retrySetBtn');
 
       if (totSet) totSet.innerText = timerState.settings.sets;
@@ -2323,7 +2508,7 @@
       if (numElem) numElem.innerText = timerState.settings.prep;
       if (pBadge) pBadge.innerText = '準備完了';
       if (pGuide) pGuide.innerText = 'タップまたはスタートで開始！';
-      if (bar) bar.style.width = '100%';
+      if (fill) fill.style.width = '100%';
       if (retryBtn) retryBtn.disabled = true;
 
       applyThemeForPhase('standby');
@@ -2549,10 +2734,10 @@
         }, 150);
       }
 
-      const bar = document.getElementById('timerProgressBar');
+      const fill = document.getElementById('timerProgressFill');
       const ratio = timerState.totalPhaseTime > 0 ? (timerState.timeLeft / timerState.totalPhaseTime) * 100 : 0;
-      if (bar) {
-        bar.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
+      if (fill) {
+        fill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
       }
 
       const hpCircle = document.getElementById('hpRingCircle');
@@ -2577,9 +2762,9 @@
       const card = document.getElementById('timerCard');
       const glow = document.getElementById('ambientGlow');
       const badge = document.getElementById('phaseBadge');
-      const bar = document.getElementById('timerProgressBar');
+      const fill = document.getElementById('timerProgressFill');
       const viewActive = document.getElementById('viewTimerActive');
-      if (!card || !glow || !badge || !bar) return;
+      if (!card || !glow || !badge || !fill) return;
 
       card.classList.remove(
         'border-emerald-500', 'border-amber-500', 'border-blue-500', 'border-zinc-800',
@@ -2590,7 +2775,7 @@
       );
       glow.classList.remove('bg-emerald-500', 'bg-amber-500', 'bg-blue-500');
       badge.classList.remove('bg-emerald-500', 'bg-amber-500', 'bg-blue-500', 'bg-zinc-800', 'text-black', 'text-white', 'text-zinc-300');
-      bar.classList.remove('bg-emerald-500', 'bg-amber-500', 'bg-blue-500');
+      fill.classList.remove('bg-emerald-500', 'bg-amber-500', 'bg-blue-500');
       if (viewActive) {
         viewActive.classList.remove('bg-emerald-950/30', 'bg-amber-950/30', 'bg-blue-950/30');
       }
@@ -2599,30 +2784,27 @@
         card.classList.add('border-emerald-400', 'bg-gradient-to-b', 'from-emerald-950', 'via-emerald-900/80', 'to-zinc-950');
         glow.classList.add('bg-emerald-500');
         badge.classList.add('bg-emerald-400', 'text-black');
-        bar.classList.add('bg-emerald-400');
+        fill.classList.add('bg-emerald-400');
         if (viewActive) viewActive.classList.add('bg-emerald-950/30');
       } else if (phase === 'rest') {
         card.classList.add('border-amber-400', 'bg-gradient-to-b', 'from-amber-950', 'via-amber-900/80', 'to-zinc-950');
         glow.classList.add('bg-amber-500');
         badge.classList.add('bg-amber-400', 'text-black');
-        bar.classList.add('bg-amber-400');
+        fill.classList.add('bg-amber-400');
         if (viewActive) viewActive.classList.add('bg-amber-950/30');
       } else if (phase === 'prep') {
         card.classList.add('border-blue-400', 'bg-gradient-to-b', 'from-blue-950', 'via-blue-900/80', 'to-zinc-950');
         glow.classList.add('bg-blue-500');
         badge.classList.add('bg-blue-400', 'text-white');
-        bar.classList.add('bg-blue-400');
+        fill.classList.add('bg-blue-400');
         if (viewActive) viewActive.classList.add('bg-blue-950/30');
       } else {
         card.classList.add('bg-zinc-900', 'border-zinc-800');
         badge.classList.add('bg-zinc-800', 'text-zinc-300');
-        bar.classList.add('bg-emerald-500');
+        fill.classList.add('bg-emerald-500');
       }
     }
 
-    // ==========================================
-    // STAMP BOOK & CALENDAR ENGINE
-    // ==========================================
     function getTodayKey() {
       const now = new Date();
       const y = now.getFullYear();
@@ -2804,6 +2986,11 @@
       if (stDisp) stDisp.innerText = totalStamps;
       if (scDisp) scDisp.innerText = streak;
       if (tmDisp) tmDisp.innerText = totalMinutes;
+
+      // Update diary count badge
+      const diaryCount = Object.keys(data).filter(k => data[k] && data[k].memo && data[k].memo.trim() !== '').length;
+      const diaryBadge = document.getElementById('diaryCountBadge');
+      if (diaryBadge) diaryBadge.innerText = `${diaryCount}件`;
 
       let pbStreak = parseInt(localStorage.getItem(STORAGE_KEY_PB_STREAK) || '0', 10);
       const streakPBBadge = document.getElementById('streakPBBadge');
@@ -3256,9 +3443,6 @@
       }
     }
 
-    // ==========================================
-    // INITIALIZATION & LIFECYCLE HOOKS
-    // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       const today = new Date();
       calendarViewYear = today.getFullYear();
