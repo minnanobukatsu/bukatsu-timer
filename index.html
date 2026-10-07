@@ -85,13 +85,17 @@
       animation: hud-fade 0.85s ease-out forwards;
     }
 
-    /* ========================================== */
-    /* 横画面（ランドスケープ）専用 全画面スコアボードスタイル */
-    /* ========================================== */
+    /* ======================================================== */
+    /* 横画面（ランドスケープ）専用: タイマー部分のみの完全全画面表示 */
+    /* ======================================================== */
     @media (orientation: landscape) and (max-height: 560px) {
-      /* 1. 最上部ヘッダー（ロゴやタブナビ）を完全に消去 */
+      /* 1. 最上部ヘッダー（ロゴ、タブナビ）を完全に消去 */
       #appHeader {
         display: none !important;
+      }
+      body {
+        overflow: hidden !important;
+        background: #09090B !important;
       }
       main {
         max-width: 100vw !important;
@@ -100,7 +104,7 @@
         padding: 0 !important;
         margin: 0 !important;
       }
-      /* 2. タイマー画面を画面いっぱいの全面キャンバスに拡張 */
+      /* 2. タイマー画面を画面100%のキャンバスへ全面拡張 */
       #viewTimerActive {
         position: fixed !important;
         inset: 0 !important;
@@ -117,36 +121,42 @@
         min-height: 100vh !important;
         border-radius: 0 !important;
         border: none !important;
-        padding: 0.5rem 1rem !important;
+        padding: 0 !important;
+        margin: 0 !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+        background: transparent !important;
       }
-      /* 3. 横画面時はボタン類（リセット・一時停止・テンポドラムなど）を完全非表示 */
+      /* 3. 最上部の操作ガイドバー、フェーズバッジ、セット数、案内テキスト、ボタン類をすべて消去 */
+      #landscapeGuideBar,
+      #timerCardHeader,
+      #phaseGuideText,
       #timerControlsRow,
       #timerSubControlBar,
-      #timerTopStandardBar {
+      #timerTopStandardBar,
+      #timerProgressBar,
+      #eyesBlinkBanner,
+      #lookupTargetContainer {
         display: none !important;
       }
-      /* 4. タイマー数字とリングゲージを超特大化 */
+      /* 4. タイマー数字とリングゲージのみを画面中央に超特大化 */
+      #timerRingWrapper {
+        margin: 0 auto !important;
+        padding: 0 !important;
+      }
       #timerRingSvg {
-        width: min(72vh, 320px) !important;
-        height: min(72vh, 320px) !important;
+        width: min(88vh, 88vw) !important;
+        height: min(88vh, 88vw) !important;
       }
       #timerNumber {
-        font-size: min(28vh, 7.5rem) !important;
+        font-size: min(38vh, 10rem) !important;
         line-height: 1 !important;
+        font-weight: 900 !important;
       }
-      #phaseGuideText {
-        font-size: 0.95rem !important;
-        margin-top: 0.25rem !important;
-      }
-      /* 5. 横画面専用の操作ガイドバーと退出ボタンを表示 */
-      #landscapeGuideBar {
-        display: flex !important;
-      }
-      #landscapeExitBtn {
+      /* 5. 邪魔にならない画面右上端の極小・半透明の退出ボタンのみ控えめに表示 */
+      #minimalLandscapeExitBtn {
         display: flex !important;
       }
     }
@@ -354,7 +364,6 @@
 
           <!-- Look-Up Category & Interval Selector -->
           <div id="lookupCategorySelector" class="hidden pt-2 mt-2 border-t border-zinc-800/60 space-y-2">
-            <!-- 秒数の直接手動入力設定 -->
             <div class="bg-zinc-950/80 p-2 rounded-xl border border-zinc-800 flex items-center justify-between">
               <span class="text-[10px] text-zinc-300 font-bold flex items-center gap-1">
                 <span>⏱</span> 切り替え間隔
@@ -478,7 +487,7 @@
     <!-- ========================================== -->
     <div id="viewTimerActive" class="hidden flex-1 flex flex-col space-y-3">
       
-      <!-- Top Standard Bar (横画面時は非表示) -->
+      <!-- Top Standard Bar (縦画面時のみ表示・横画面時は完全非表示) -->
       <div id="timerTopStandardBar" class="flex items-center justify-between">
         <button onclick="leaveCountdownScreen()" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition flex items-center gap-1 border border-zinc-700">
           <span>‹</span>
@@ -486,12 +495,10 @@
         </button>
 
         <div class="flex items-center gap-1.5">
-          <!-- Lookup mode status indicator in timer screen -->
           <button id="timerLookupBadge" onclick="toggleTimerLookupQuick()" class="hidden text-[10px] px-2 py-1 rounded-lg border font-bold items-center gap-1 bg-purple-950/80 border-purple-500/60 text-purple-300">
             <span>👀</span>
             <span>ルックアップON</span>
           </button>
-          <!-- Fullscreen toggle indicator/button -->
           <button id="toggleFullscreenBtn" onclick="toggleFullscreenManual()" class="text-[10px] px-2 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-bold flex items-center gap-1 transition">
             <span id="fsIcon">⛶</span>
             <span id="fsText">全画面</span>
@@ -502,18 +509,12 @@
         </div>
       </div>
 
-      <!-- 横画面専用操作ヒントバー（横画面時のみ上部に表示） -->
-      <div id="landscapeGuideBar" class="hidden w-full items-center justify-between px-4 py-1.5 text-[11px] font-bold text-zinc-400 z-30 select-none">
-        <span class="flex items-center gap-2 text-zinc-300">
-          <span class="bg-zinc-800/90 border border-zinc-700 px-2 py-0.5 rounded-md">👆 1回タップ: 一時停止/再開</span>
-          <span class="bg-zinc-800/90 border border-zinc-700 px-2 py-0.5 rounded-md">✌ 2回タップ: リセット</span>
-        </span>
-        <button id="landscapeExitBtn" onclick="leaveCountdownScreen()" class="hidden bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-3 py-1 rounded-lg text-xs font-bold items-center gap-1 transition">
-          ✕ 終了
-        </button>
-      </div>
+      <!-- 横画面専用: 右上端の極小・半透明の退出ボタン（視界の邪魔にならない配置） -->
+      <button id="minimalLandscapeExitBtn" onclick="leaveCountdownScreen()" class="hidden fixed top-3 right-3 z-50 px-2.5 py-1 rounded-lg bg-zinc-900/60 hover:bg-zinc-800/90 text-zinc-400 hover:text-white text-[11px] font-bold border border-zinc-700/50 backdrop-blur-sm opacity-25 hover:opacity-100 transition-opacity flex items-center gap-1">
+        ✕
+      </button>
 
-      <!-- Visual Giant Display Board (タップジェスチャー領域) -->
+      <!-- Visual Giant Display Board (画面全体がタップジェスチャー領域) -->
       <div id="timerCard" onclick="handleTimerCardTap(event)" class="relative rounded-3xl p-5 sm:p-6 bg-zinc-900 border-2 border-zinc-800 transition-all duration-500 shadow-2xl flex flex-col items-center justify-center flex-1 min-h-[350px] overflow-hidden cursor-pointer select-none">
         
         <!-- Ambient Background Glow -->
@@ -525,8 +526,8 @@
           <span id="hudText" class="text-base sm:text-xl font-black text-white tracking-wider">一時停止中</span>
         </div>
 
-        <!-- Header: Phase Badge and Set Counter -->
-        <div class="w-full flex items-center justify-between z-10 mb-1 pointer-events-none">
+        <!-- Header: Phase Badge and Set Counter (縦画面のみ表示・横画面時は完全非表示) -->
+        <div id="timerCardHeader" class="w-full flex items-center justify-between z-10 mb-1 pointer-events-none">
           <div class="flex items-center gap-1.5">
             <span id="phaseBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 transition-all shadow">
               準備完了
@@ -542,7 +543,7 @@
           </div>
         </div>
 
-        <!-- Look-Up Target Box -->
+        <!-- Look-Up Target Box (縦画面用) -->
         <div id="lookupTargetContainer" class="hidden w-full max-w-sm my-1 z-20 pointer-events-none">
           <div id="lookupCard" class="py-2 px-3 rounded-2xl border-2 border-white/40 shadow-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 bg-red-600 text-white">
             <span id="lookupPromptSubtext" class="text-[9px] font-black bg-black/50 px-2 py-0.5 rounded-full text-white tracking-wider flex items-center gap-1">
@@ -558,8 +559,8 @@
           <span>めせん！前をみよう！</span>
         </div>
 
-        <!-- Main Time Display with SVG Circular HP-Gauge Ring -->
-        <div class="relative my-auto py-1 z-10 flex items-center justify-center pointer-events-none">
+        <!-- Main Time Display with SVG Circular HP-Gauge Ring (横画面時はこれが画面全面に表示) -->
+        <div id="timerRingWrapper" class="relative my-auto py-1 z-10 flex items-center justify-center pointer-events-none">
           <svg id="timerRingSvg" class="w-52 h-52 sm:w-64 sm:h-64 pointer-events-none drop-shadow-lg" viewBox="0 0 200 200">
             <circle cx="100" cy="100" r="86" stroke="#202024" stroke-width="12" fill="none" />
             <circle id="hpRingCircle" class="hp-ring-circle" cx="100" cy="100" r="86" stroke="#10B981" stroke-width="12" stroke-linecap="round" fill="none" stroke-dasharray="540.35" stroke-dashoffset="0" />
@@ -575,13 +576,13 @@
           </div>
         </div>
 
-        <!-- Dynamic Linear Progress Bar -->
-        <div class="w-full bg-zinc-850 h-2.5 rounded-full mt-2 overflow-hidden z-10 border border-zinc-700/60 pointer-events-none">
-          <div id="timerProgressBar" class="h-full bg-emerald-500 transition-all duration-300 w-full rounded-full"></div>
+        <!-- Dynamic Linear Progress Bar (縦画面のみ) -->
+        <div id="timerProgressBar" class="w-full bg-zinc-850 h-2.5 rounded-full mt-2 overflow-hidden z-10 border border-zinc-700/60 pointer-events-none">
+          <div class="h-full bg-emerald-500 transition-all duration-300 w-full rounded-full"></div>
         </div>
       </div>
 
-      <!-- Audio Toggles & Repeat Set Row (横画面時は非表示) -->
+      <!-- Audio Toggles & Repeat Set Row (縦画面のみ・横画面時は完全非表示) -->
       <div id="timerSubControlBar" class="flex items-center justify-between bg-zinc-900/90 border border-zinc-800 px-3.5 py-2 rounded-xl">
         <label class="flex items-center gap-1.5 cursor-pointer">
           <input type="checkbox" id="bgmToggle" checked class="sr-only peer">
@@ -597,7 +598,7 @@
         </button>
       </div>
 
-      <!-- Main Action Buttons (横画面時は非表示) -->
+      <!-- Main Action Buttons (縦画面のみ・横画面時は完全非表示) -->
       <div id="timerControlsRow" class="grid grid-cols-3 gap-2">
         <button onclick="stopTimer()" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-300 font-bold py-3.5 rounded-xl border border-zinc-700 transition flex flex-col items-center justify-center">
           <span class="text-base">⏹</span>
@@ -821,9 +822,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: CREATE / RENAME PRESET MODAL        -->
-  <!-- ========================================== -->
+  <!-- MODAL: CREATE / RENAME PRESET MODAL -->
   <div id="presetEditModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5">
     <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-5 max-w-xs w-full space-y-3 shadow-2xl">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
@@ -852,9 +851,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: FINISH CELEBRATION                  -->
-  <!-- ========================================== -->
+  <!-- MODAL: FINISH CELEBRATION -->
   <div id="finishModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5">
     <div class="bg-zinc-900 border-2 border-emerald-500 rounded-3xl p-5 max-w-xs w-full text-center space-y-3 shadow-2xl relative">
       <div class="text-4xl">🏀</div>
@@ -883,9 +880,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: AVATAR LOCKER ROOM (8 ITEMS)       -->
-  <!-- ========================================== -->
+  <!-- MODAL: AVATAR LOCKER ROOM (8 ITEMS) -->
   <div id="avatarLockerModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5">
     <div class="bg-zinc-900 border-2 border-zinc-700 rounded-3xl p-4 sm:p-5 max-w-xs w-full space-y-3 shadow-2xl">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
@@ -955,9 +950,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- MODAL: OBSERVATION MEMO (親のひとこと観察日記) -->
-  <!-- ========================================== -->
   <div id="praiseAndMemoModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5">
     <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-5 max-w-xs w-full space-y-3 shadow-2xl">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
@@ -993,9 +986,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: MONTHLY DIGITAL AWARD              -->
-  <!-- ========================================== -->
+  <!-- MODAL: MONTHLY DIGITAL AWARD -->
   <div id="awardModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5">
     <div class="bg-zinc-900 border-2 border-amber-500 rounded-3xl p-5 max-w-xs w-full text-center space-y-3 shadow-2xl">
       <div class="text-4xl">🏆</div>
@@ -1030,9 +1021,6 @@
   <!-- JAVASCRIPT LOGIC & AUDIO SYNTHESIS         -->
   <!-- ========================================== -->
   <script>
-    /**
-     * BUKATSU NEXT Web Audio & Web Speech Synthesizer
-     */
     let audioCtx = null;
     let bgmIntervalId = null;
     let bgmStep = 0;
@@ -1351,7 +1339,6 @@
     let tapTimeout = null;
 
     function handleTimerCardTap(event) {
-      // ボタン等の子要素タップ時は除外
       if (event && event.target && event.target.closest('button, input, label')) {
         return;
       }
@@ -1359,12 +1346,10 @@
       tapCount++;
       if (tapCount === 1) {
         tapTimeout = setTimeout(() => {
-          // シングルタップ判定: 一時停止 / 再開
           tapCount = 0;
           executeSingleTapAction();
         }, 260);
       } else if (tapCount === 2) {
-        // ダブルタップ判定: リセット
         clearTimeout(tapTimeout);
         tapCount = 0;
         executeDoubleTapAction();
@@ -1402,7 +1387,7 @@
       hud.style.borderColor = borderColor;
 
       hud.classList.remove('hidden', 'hud-popup-anim');
-      void hud.offsetWidth; // リフロー発生でアニメーションリセット
+      void hud.offsetWidth;
       hud.classList.add('hud-popup-anim');
 
       setTimeout(() => {
@@ -1454,7 +1439,6 @@
 
       localStorage.setItem(STORAGE_KEY_EQUIPPED_AVATAR, avatarKey);
 
-      // きょう既にスタンプが押されている場合は、きょうの日付のスタンプも新しいアバターに即時同期
       const todayKey = getTodayKey();
       if (stampData[todayKey]) {
         stampData[todayKey].avatarKey = avatarKey;
@@ -1784,7 +1768,6 @@
       if (label) label.innerText = currentModalTargetDateKey;
       if (input) input.value = dayRecord?.memo || '';
 
-      // スタンプが既に押されている場合のみ「削除」ボタンを表示
       if (deleteBtn) {
         if (dayRecord) {
           deleteBtn.classList.remove('hidden');
@@ -2248,9 +2231,6 @@
       }
     }
 
-    /**
-     * 1秒刻みで設定値を増減するステッパーロジック
-     */
     function adjustSettingValue(inputId, delta, min, max) {
       const input = document.getElementById(inputId);
       if (!input) return;
@@ -3301,7 +3281,6 @@
       updateLookupCategoryButtonsUI();
       updateLookupBadgeUI();
 
-      // Initialize custom presets
       const activePreset = getActivePreset();
       currentActivePresetId = activePreset.id;
 
